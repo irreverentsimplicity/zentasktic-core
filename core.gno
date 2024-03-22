@@ -8,6 +8,8 @@ import (
 
 // entry point
 
-// GetContexts, GetTasks, GetProjects, GetCollections
-
 // GetZenStatus
+
+func () GetZenStatus() (zenStatus string, err error) {
+	// implementation
+}

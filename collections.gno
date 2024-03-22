@@ -12,7 +12,7 @@ type Collection struct {
 	Name 		string `json:"collectionName"`
 }
 
-// collections
+// actions
 
 func (Collection c) AddCollection() (err error) {
 	// implementation
@@ -35,5 +35,15 @@ func (Collection c) RemoveTaskFromCollection(p Project) (err error) {
 }
 
 func (Collection c) DeleteCollection() (err error) {
+	// implementation
+}
+
+// getters
+
+func () GetCollections(string realmId) (collections string, err error) {
+	// implementation
+}
+
+func () GetCollectionById(string collectionId) (collection string, err error) {
 	// implementation
 }

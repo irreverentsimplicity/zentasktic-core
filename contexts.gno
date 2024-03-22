@@ -12,20 +12,96 @@ type Context struct {
 	Name 		string `json:"contextName"`
 }
 
-// contexts
+var (
+	Contexts avl.Tree // contextId -> Context
+)
 
-func (Context ct) AddContext() (err error) {
+// actions
+
+func () AddContext(string contextId, string contextName) (err error) {
 	// implementation
+	newContext := &Context{
+		ID: contextId,
+		Name: contextName,
+	}
+	Contexts.Set(contextId, newContext)
+	return nil
 }
 
-func (Context ct) RemoveContext() (err error) {
-	// implementation
+func () EditContext(string contextId, string newContextName) (err error){
+	context, err = contexts.Get(contextId)
+	if err != nil {
+		return err
+	}
+	editedContext := &Context{
+		ID: contextId,
+		Name: newContextName,
+	}
+	Contexts.Set(contextId, editedContext)
+	return nil
 }
 
-func (Context ct) AddContextToTask(t Task) (err error) {
+func () RemoveContext(string contextId) (err error) {
 	// implementation
+	context, err = contexts.Get(contextId)
+	if err != nil {
+		return err
+	}
+	Contexts.Remove(contextId)
 }
 
-func (Context ct) AddContextToProject(p Project) (err error) {
+func () AddContextToTask(string contextId, string taskId) (err error) {
+	// implementation
+
+	// check if task exists
+	task, terr := tasks.Get(taskId)
+	if terr != nil {
+		return terr
+	}
+	// check if context exists
+	context, cerr := contexts.Get(contextId)
+	if cerr != nil {
+		return cerr
+	}
+
+	editedTask := &Task {
+		Id: task.Id
+		ProjectId: task.ProjectId
+		ContextId: contextId
+		RealmId: task.RealmId
+		Body: task.Body
+		Due: task.Due
+		Alert: task.Alert
+	}
+	Tasks.Set(taskId, editedTask)
+	return nil
+}
+
+func () AddContextToProject(string contextId, string projectId) (err error) {
+	// check if project exists
+	project, perr := projects.Get(projectId)
+	if perr != nil {
+		return perr
+	}
+	// check if context exists
+	context, cerr := contexts.Get(contextId)
+	if cerr != nil {
+		return cerr
+	}
+
+	editedProject := &Project {
+		Id: project.ProjectId
+		ContextId: contextId	
+		RealmId: project.RealmId
+		Body: project.Body
+		Due: project.Due
+	}
+	Projects.Set(projectId, editedProject)
+	return nil
+}
+
+// getters
+
+func () GetContexts() (contexts string, err error) {
 	// implementation
 }

@@ -16,9 +16,17 @@ type Task struct {
 	Alert		string `json:"taskAlert"`
 }
 
-// tasks
+var (
+	Tasks avl.Tree // taskId -> Task
+)
+
+// actions
 
 func (Task t) AddTask() (err error) {
+	// implementation
+}
+
+func (Task t) EditTask() (err error) {
 	// implementation
 }
 
@@ -35,5 +43,23 @@ func (Task t) AttachTaskToProject(p Project) (err error) {
 }
 
 func (Task t) DetachTaskFromProject(p Project) (err error) {
+	// implementation
+}
+
+// getters
+
+func () GetAllTasks() (tasks string, err error) {
+	// implementation
+}
+
+func () GetTasksByRealm(string realmId) (tasks string, err error) {
+	// implementation
+}
+
+func () GetTasksByContext(string contextId) (tasks string, err error) {
+	// implementation
+}
+
+func () GetTasksByDate(string date) (tasks string, err error) {
 	// implementation
 }
