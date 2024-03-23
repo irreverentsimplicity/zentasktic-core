@@ -104,4 +104,5 @@ func () AddContextToProject(string contextId, string projectId) (err error) {
 
 func () GetContexts() (contexts string, err error) {
 	// implementation
+	
 }
