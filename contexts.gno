@@ -73,7 +73,14 @@ func () AddContextToTask(string contextId, string taskId) (err error) {
 		Due: task.Due
 		Alert: task.Alert
 	}
-	Tasks.Set(taskId, editedTask)
+	// check to see if task is editable -> RealmId = 1 (Assess)
+	if editedTask.RealmId == 1 {
+		Tasks.Set(taskId, editedTask)
+	}
+	else {
+		return ErrTaskNotEditable
+	}
+
 	return nil
 }
 
@@ -96,7 +103,14 @@ func () AddContextToProject(string contextId, string projectId) (err error) {
 		Body: project.Body
 		Due: project.Due
 	}
-	Projects.Set(projectId, editedProject)
+	// check to see if task is editable -> RealmId = 1 (Assess)
+	if editedProject.RealmId == 1 {
+		Projects.Set(taskId, editedProject)
+	}
+	else {
+		return ErrProjectNotEditable
+	}
+	
 	return nil
 }
 
