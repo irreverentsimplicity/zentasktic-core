@@ -8,15 +8,17 @@ import (
 
 
 type Project struct {
-	Id 			string `json:"taskId"`
+	Id 			string `json:"projectId"`
 	ContextId	string `json:"projectContextId"`
 	RealmId 	string `json:"projectRealmId"`
+	Tasks		string `json:"projectTasks"`
 	Body 		string `json:"projectBody"`
 	Due			string `json:"ProjectDue"`
 }
 
 var (
 	Projects avl.Tree // projectId -> Project
+	ProjectTasks avl.Tree // projectId -> []Task
 )
 
 // actions

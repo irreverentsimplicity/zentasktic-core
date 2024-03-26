@@ -10,7 +10,15 @@ import (
 type Collection struct {
 	Id 			string `json:"collectionId"`
 	Name 		string `json:"collectionName"`
+	Tasks		string `json:"collectionTasks"`
+	Projects	string `json:"collectionProjects"`
 }
+
+var (
+	Collections avl.Tree // collectionId -> Collection
+	CollectionTasks avl.Tree // CollectionId -> []Task
+	CollectionProjects avl.Tree // CollectionID -> []Project
+)
 
 // actions
 
