@@ -22,24 +22,66 @@ var (
 
 // actions
 
+
 func (Task t) AddTask() (err error) {
 	// implementation
+	existingTask, terr := Tasks.Get(t.Id)
+	if terr == nil {
+		return ErrTaskIdAlreadyExists
+	}
+	Tasks.Set(t.Id, t)
+	return nil
 }
 
 func (Task t) EditTask() (err error) {
-	// implementation
+	// implementation, get task by Id and replace the object
+	existingTask, terr := Tasks.Get(t.Id)
+	if terr != nil {
+		return ErrTaskIdNotFound
+	}
+	Tasks.Set(t.Id, t)
+	return nil
 }
 
 func (Task t) MoveTaskToRealm(r Realm) (err error) {
 	// implementation
+	existingTask, terr := Tasks.Get(t.Id)
+	if terr != nil {
+		return ErrTaskIdNotFound
+	}
+	t.RealmId = r.Id
+	Tasks.Set(t.Id, t)
 }
 
-func (Task t) MarkTaskAsDone() (err error) {
+func (t Task) AttachTaskToProject(p Project) error {
 	// implementation
-}
+	existingProject, perr := Projects.Get(p.Id)
+	if perr != nil {
+		return perr
+	}
 
-func (Task t) AttachTaskToProject(p Project) (err error) {
-	// implementation
+	project, ok := existingProject.(*Project)
+	if !ok {
+		return ErrProjectIdNotFound
+	}
+
+	existingProjectTasks, pterr := ProjectTasks.Get(p.Id)
+	if pterr != nil {
+		// If the project has no tasks yet, initialize the slice.
+		existingProjectTasks = []Task{}
+	} else {
+		tasks, ok := existingProjectTasks.([]Task)
+		if !ok {
+			return ErrProjectTasksNotFound
+		}
+		existingProjectTasks = tasks
+	}
+
+	updatedTasks := append(existingProjectTasks.([]Task), t)
+
+	ProjectTasks.Set(p.Id, updatedTasks)
+
+	return nil
 }
 
 func (Task t) DetachTaskFromProject(p Project) (err error) {
@@ -47,6 +89,11 @@ func (Task t) DetachTaskFromProject(p Project) (err error) {
 }
 
 // getters
+
+func () GetTaskById(taskId string) Task {
+	t, _ := Tasks.Get(taskId)
+	return t.(Task)
+}
 
 func () GetAllTasks() (tasks string, err error) {
 	// implementation

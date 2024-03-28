@@ -31,11 +31,13 @@ func (Project p) MoveProjectToRealm(r Realm) (err error) {
 	// implementation
 }
 
-func (Project p) MarkProjectAsDone() (err error) {
-	// implementation
-}
-
 // getters
+
+
+func () GetPrpojectById(projectId string) Task {
+	p, _ := Projects.Get(projectId)
+	return p.(Project)
+}
 
 func () GetProjectsByRealm(string realmId) (projects string, err error) {
 	// implementation
