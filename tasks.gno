@@ -27,9 +27,11 @@ var (
 
 func (Task t) AddTask() (err error) {
 	// implementation
-	existingTask, terr := Tasks.Get(t.Id)
-	if terr == nil {
-		return ErrTaskIdAlreadyExists
+	if Tasks.Size() != 0 {
+		existingTask, terr := Tasks.Get(t.Id)
+		if terr == nil {
+			return ErrTaskIdAlreadyExists
+		}
 	}
 	Tasks.Set(t.Id, t)
 	return nil
@@ -37,9 +39,11 @@ func (Task t) AddTask() (err error) {
 
 func (Task t) EditTask() (err error) {
 	// implementation, get task by Id and replace the object
-	existingTask, terr := Tasks.Get(t.Id)
-	if terr != nil {
-		return ErrTaskIdNotFound
+	if Tasks.Size() != 0 {
+		existingTask, terr := Tasks.Get(t.Id)
+		if terr != nil {
+			return ErrTaskIdNotFound
+		}
 	}
 	Tasks.Set(t.Id, t)
 	return nil
@@ -47,9 +51,11 @@ func (Task t) EditTask() (err error) {
 
 func (Task t) MoveTaskToRealm(r Realm) (err error) {
 	// implementation
-	existingTask, terr := Tasks.Get(t.Id)
-	if terr != nil {
-		return ErrTaskIdNotFound
+	if Tasks.Size() != 0 {
+		existingTask, terr := Tasks.Get(t.Id)
+		if terr != nil {
+			return ErrTaskIdNotFound
+		}
 	}
 	t.RealmId = r.Id
 	Tasks.Set(t.Id, t)
@@ -57,9 +63,11 @@ func (Task t) MoveTaskToRealm(r Realm) (err error) {
 
 func (t Task) AttachTaskToProject(p Project) error {
 	// implementation
-	existingProject, perr := Projects.Get(p.Id)
-	if perr != nil {
-		return perr
+	if Projects.Size() != 0 {
+		existingProject, perr := Projects.Get(p.Id)
+		if perr != nil {
+			return perr
+		}
 	}
 
 	project, ok := existingProject.(*Project)
@@ -93,8 +101,10 @@ func (Task t) DetachTaskFromProject(p Project) (err error) {
 // getters
 
 func () GetTaskById(taskId string) Task {
-	t, _ := Tasks.Get(taskId)
-	return t.(Task)
+	if Tasks.Size() != 0 {
+		t, _ := Tasks.Get(taskId)
+		return t.(Task)
+	}
 }
 
 func () GetAllTasks() (tasks string, err error) {

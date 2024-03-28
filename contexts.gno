@@ -28,6 +28,7 @@ func () AddContext(string contextId, string contextName) (err error) {
 	return nil
 }
 
+/*
 func () EditContext(string contextId, string newContextName) (err error){
 	context, err = contexts.Get(contextId)
 	if err != nil {
@@ -112,7 +113,7 @@ func () AddContextToProject(string contextId, string projectId) (err error) {
 	}
 	
 	return nil
-}
+}*/
 
 // getters
 
