@@ -3,13 +3,14 @@ package zentasktic_core
 import (
 	"std"
 	"testing"
+
+	"gno.land/p/demo/testutils"
+	"gno.land/p/demo/ufmt"
 )
 
 
 func TestAddTask(t *testing.T) {
-    //setup()
-    //defer teardown()
-
+    
     task := Task{Id: "task1", RealmId: "realm1"}
 
     // Test adding a task successfully.
