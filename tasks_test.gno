@@ -1,22 +1,14 @@
-package zentasktic_core
+package zentasktic
 
 import (
-	"std"
 	"testing"
 
-	"gno.land/p/demo/testutils"
-	"gno.land/p/demo/ufmt"
     "gno.land/p/demo/avl"
 )
 
-var (
-    Tasks *avl.Tree = avl.NewTree() // Ensure Tasks is initialized for testing
-)
-
-
-func TestAddTask(t *testing.T) {
-    Tasks = avl.NewTree()
-    task := Task{Id: "task1", RealmId: "realm1"}
+func Test_AddTask(t *testing.T) {
+    
+    task := Task{Id: "1", RealmId: "1"}
 
     // Test adding a task successfully.
     err := task.AddTask()
@@ -25,8 +17,55 @@ func TestAddTask(t *testing.T) {
     }
 
     // Test adding a duplicate task.
-    err = task.AddTask()
-    if err != ErrTaskIdAlreadyExists {
-        t.Errorf("Expected ErrTaskIdAlreadyExists, got %v", err)
+    cerr := task.AddTask()
+    if cerr != ErrTaskIdAlreadyExists {
+        t.Errorf("Expected ErrTaskIdAlreadyExists, got %v", cerr)
+    }
+}
+
+
+func Test_EditTask(t *testing.T) {
+    
+    task := Task{Id: "2", Body: "First content", RealmId: "1"}
+
+    // Test adding a task successfully.
+    err := task.AddTask()
+    if err != nil {
+        t.Errorf("Failed to add task: %v", err)
+    }
+
+    // Test editing the task
+    editedTask := Task{Id: task.Id, Body: "Edited content", RealmId: task.RealmId}
+    cerr := editedTask.EditTask()
+    if cerr != nil {
+        t.Errorf("Failed to edit the task")
+    }
+
+    retrievedTask, _ := GetTaskById(editedTask.Id)
+    if retrievedTask.Body != "Edited content" {
+        t.Errorf("Task was not edited")
+    }
+}
+
+func Test_MoveTaskToRealm(t *testing.T) {
+    
+    task := Task{Id: "4", Body: "First content", RealmId: "1"}
+
+    // Test adding a task successfully.
+    err := task.AddTask()
+    if err != nil {
+        t.Errorf("Failed to add task: %v", err)
+    }
+
+    // Test moving the task to another realm
+    
+    cerr := task.MoveTaskToRealm("2")
+    if cerr != nil {
+        t.Errorf("Failed to move task to another realm")
+    }
+
+    retrievedTask, _ := GetTaskById(task.Id)
+    if retrievedTask.RealmId != "2" {
+        t.Errorf("Task was moved to the wrong realm")
     }
 }

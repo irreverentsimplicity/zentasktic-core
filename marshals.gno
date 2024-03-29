@@ -1,4 +1,4 @@
-package zentasktic_core
+package zentasktic
 
 import (
 	"strconv"
@@ -8,19 +8,19 @@ import (
 )
 
 
-type Contexts struct {
-	Items	[]Context
+type ContextsObject struct {
+	Contexts	[]Context
 }
 
-type Tasks struct {
-	Items	[]Task
+type TasksObject struct {
+	Tasks	[]Task
 }
 
-type Projects struct {
+type ProjectsObject struct {
 	Items	[]Project
 }
 
-type Collections struct {
+type CollectionsObject struct {
 	Items	[]Collection
 }
 
@@ -43,17 +43,17 @@ func (c Context) MarshalJSON() ([]byte, error) {
 	return b.Bytes(), nil
 }
 
-func (cs Contexts) MarshalJSON() ([]byte, error) {
+func (cs ContextsObject) MarshalJSON() ([]byte, error) {
 	var b bytes.Buffer
 
-	c.WriteString(`{"contexts":[`)
-	for i, context := range cs.Items {
+	b.WriteString(`{"contexts":[`)
+	for i, context := range cs.Contexts {
 		if i > 0 {
 			b.WriteString(`,`)
 		}
 		contextJSON, cerr := context.MarshalJSON()
-		if cerr != nil {
-			b.WriteString(contextJSON)
+		if cerr == nil {
+			b.WriteString(string(contextJSON))
 		}
 	}
 	b.WriteString(`]}`)
@@ -72,7 +72,7 @@ func (t Task) MarshalJSON() ([]byte, error) {
 	b.WriteString(`",`)
 
 	b.WriteString(`"taskProjectId":"`)
-	b.WriteString(t.taskProjectId)
+	b.WriteString(t.ProjectId)
 	b.WriteString(`",`)
 
 	b.WriteString(`"taskContextId":"`)
@@ -100,17 +100,17 @@ func (t Task) MarshalJSON() ([]byte, error) {
 	return b.Bytes(), nil
 }
 
-func (ts Tasks) MarshalJSON() ([]byte, error) {
+func (ts TasksObject) MarshalJSON() ([]byte, error) {
 	var b bytes.Buffer
 
-	c.WriteString(`{"tasks":[`)
-	for i, task := range ts.Items {
+	b.WriteString(`{"tasks":[`)
+	for i, task := range ts.Tasks {
 		if i > 0 {
 			b.WriteString(`,`)
 		}
 		taskJSON, cerr := task.MarshalJSON()
-		if cerr != nil {
-			b.WriteString(taskJSON)
+		if cerr == nil {
+			b.WriteString(string(taskJSON))
 		}
 	}
 	b.WriteString(`]}`)
@@ -138,13 +138,13 @@ func (p Project) MarshalJSON() ([]byte, error) {
 	b.WriteString(`",`)
 
 	b.WriteString(`{"projectTasks":[`)
-	for i, projectTasks := range p.Tasks {
+	for i, projectTask := range p.Tasks {
 		if i > 0 {
 			b.WriteString(`,`)
 		}
-		projectTasksJSON, perr := projectTasks.MarshalJSON()
-		if perr != nil {
-			b.WriteString(projectTasksJSON)
+		projectTaskJSON, perr := projectTask.MarshalJSON()
+		if perr == nil {
+			b.WriteString(string(projectTaskJSON))
 		}
 	}
 	b.WriteString(`],`)
@@ -162,17 +162,17 @@ func (p Project) MarshalJSON() ([]byte, error) {
 	return b.Bytes(), nil
 }
 
-func (ps Projects) MarshalJSON() ([]byte, error) {
+func (ps ProjectsObject) MarshalJSON() ([]byte, error) {
 	var b bytes.Buffer
 
-	c.WriteString(`{"projects":[`)
+	b.WriteString(`{"projects":[`)
 	for i, project := range ps.Items {
 		if i > 0 {
 			b.WriteString(`,`)
 		}
 		projectJSON, perr := project.MarshalJSON()
-		if perr != nil {
-			b.WriteString(projectJSON)
+		if perr == nil {
+			b.WriteString(string(projectJSON))
 		}
 	}
 	b.WriteString(`]}`)
@@ -195,25 +195,25 @@ func (c Collection) MarshalJSON() ([]byte, error) {
 	b.WriteString(`",`)
 
 	b.WriteString(`{"collectionTasks":[`)
-	for i, collectionTasks := range c.Tasks {
+	for i, collectionTask := range c.Tasks {
 		if i > 0 {
 			b.WriteString(`,`)
 		}
-		collectionTasksJSON, perr := collectionTasks.MarshalJSON()
-		if perr != nil {
-			b.WriteString(collectionTasksJSON)
+		collectionTaskJSON, perr := collectionTask.MarshalJSON()
+		if perr == nil {
+			b.WriteString(string(collectionTaskJSON))
 		}
 	}
 	b.WriteString(`],`)
 
 	b.WriteString(`{"collectionProjects":[`)
-	for i, collectionProjects := range c.Projects {
+	for i, collectionProject := range c.Projects {
 		if i > 0 {
 			b.WriteString(`,`)
 		}
-		collectionProjectsJSON, perr := collectionProjects.MarshalJSON()
-		if perr != nil {
-			b.WriteString(collectionProjectsJSON)
+		collectionProjectJSON, perr := collectionProject.MarshalJSON()
+		if perr == nil {
+			b.WriteString(string(collectionProjectJSON))
 		}
 	}
 	b.WriteString(`],`)

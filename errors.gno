@@ -1,4 +1,4 @@
-package zentasktic_core
+package zentasktic
 
 import "errors"
 
@@ -9,4 +9,6 @@ var (
 	ErrTaskIdNotFound				= errors.New("Task id not found")
 	ErrProjectTasksNotFound			= errors.New("Could not get tasks for project")
 	ErrTaskIdAlreadyExists			= errors.New("A task with the provided id already exists")
+	ErrTaskByIdNotFound				= errors.New("Can't get task by id")
+	ErrTaskNotInAssessRealm			= errors.New("Task is not in Assess, cannot be edited")
 )

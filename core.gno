@@ -1,5 +1,5 @@
 // base implementation
-package zentasktic_core
+package zentasktic
 
 import (
 	"strconv"
@@ -9,7 +9,7 @@ import (
 // entry point
 
 // GetZenStatus
-
+/*
 func () GetZenStatus() (zenStatus string, err error) {
 	// implementation
-}
+}*/

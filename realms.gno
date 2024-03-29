@@ -1,5 +1,5 @@
 // base implementation
-package zentasktic_core
+package zentasktic
 
 import (
 	"strconv"
@@ -13,7 +13,7 @@ type Realm struct {
 	Name 		string `json:"realmName"`
 }
 
-
+/*
 func () GetRealm(string realmId) (collections string, err error) {
 	// implementation
-}
+}*/

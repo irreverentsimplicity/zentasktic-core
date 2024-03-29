@@ -1,17 +1,19 @@
 // base implementation
-package zentasktic_core
+package zentasktic
 
 import (
 	"strconv"
 	"errors"
+
+	"gno.land/p/demo/avl"
 )
 
 
 type Collection struct {
 	Id 			string `json:"collectionId"`
 	Name 		string `json:"collectionName"`
-	Tasks		string `json:"collectionTasks"`
-	Projects	string `json:"collectionProjects"`
+	Tasks		[]Task `json:"collectionTasks"`
+	Projects	[]Project `json:"collectionProjects"`
 }
 
 var (
@@ -21,7 +23,7 @@ var (
 )
 
 // actions
-
+/*
 func (Collection c) AddCollection() (err error) {
 	// implementation
 }
@@ -54,4 +56,4 @@ func () GetCollections(string realmId) (collections string, err error) {
 
 func () GetCollectionById(string collectionId) (collection string, err error) {
 	// implementation
-}
+}*/

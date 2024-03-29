@@ -1,9 +1,11 @@
 // base implementation
-package zentasktic_core
+package zentasktic
 
 import (
 	"strconv"
 	"errors"
+
+	"gno.land/p/demo/avl"
 )
 
 
@@ -17,7 +19,7 @@ var (
 )
 
 // actions
-
+/*
 func () AddContext(string contextId, string contextName) (err error) {
 	// implementation
 	newContext := &Context{
@@ -28,7 +30,7 @@ func () AddContext(string contextId, string contextName) (err error) {
 	return nil
 }
 
-/*
+
 func () EditContext(string contextId, string newContextName) (err error){
 	context, err = contexts.Get(contextId)
 	if err != nil {
@@ -113,11 +115,11 @@ func () AddContextToProject(string contextId, string projectId) (err error) {
 	}
 	
 	return nil
-}*/
+}
 
 // getters
 
 func () GetContexts() (contexts string, err error) {
 	// implementation
 	
-}
+}*/

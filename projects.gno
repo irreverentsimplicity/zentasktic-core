@@ -1,9 +1,11 @@
 // base implementation
-package zentasktic_core
+package zentasktic
 
 import (
 	"strconv"
 	"errors"
+
+	"gno.land/p/demo/avl"
 )
 
 
@@ -11,7 +13,7 @@ type Project struct {
 	Id 			string `json:"projectId"`
 	ContextId	string `json:"projectContextId"`
 	RealmId 	string `json:"projectRealmId"`
-	Tasks		string `json:"projectTasks"`
+	Tasks		[]Task `json:"projectTasks"`
 	Body 		string `json:"projectBody"`
 	Due			string `json:"ProjectDue"`
 }
@@ -22,7 +24,7 @@ var (
 )
 
 // actions
-
+/*
 func (Project p) AddProject() (err error) {
 	// implementation
 }
@@ -57,4 +59,4 @@ func () GetProjectTasks(string projectId) (tasks string, err error) {
 
 func () GetAllProjects() (projects string, err error) {
 	// implementation
-}
+}*/
