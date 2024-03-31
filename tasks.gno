@@ -184,7 +184,7 @@ func GetTasksByRealm(realmId string) (tasks string, err error) {
 				realmTasks = append(realmTasks, task)
 			}
 		}
-		return true // Continue iteration until all nodes have been visited.
+		return false // Continue iteration until all nodes have been visited.
 	})
 
 	// Create a TasksObject with all collected tasks.

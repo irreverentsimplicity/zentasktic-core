@@ -203,21 +203,12 @@ func TestDetachTaskFromProject(t *testing.T) {
 
 func Test_GetAllTasks(t *testing.T) {
     
+    // mocking the tasks based on previous tests
+    // TODO: add isolation?
     knownTasks := []Task{
         {Id: "1", RealmId: "1", Body: "First task"},
-        {Id: "2", Body: "First content", RealmId: "1"},
-        {Id: "3", Body: "Edited content", RealmId: "1"},
-    }
-
-    /*
-    for _, task := range knownTasks {
-        //Tasks.Set(task.Id, task)
-        task.AddTask()
-    }*/
-
-    // Verify that both tasks have been added.
-    if Tasks.Size() != len(knownTasks) {
-        t.Errorf("Expected AVL tree size to be %d, got %d", len(knownTasks), Tasks.Size())
+        {Id: "2", Body: "Edited content", RealmId: "1"},
+        {Id: "3", Body: "First content", RealmId: "2"},
     }
 
     // Manually marshal the known tasks to create the expected outcome.
@@ -231,6 +222,38 @@ func Test_GetAllTasks(t *testing.T) {
     actual, err := GetAllTasks()
     if err != nil {
         t.Fatalf("GetAllTasks() failed with error: %v", err)
+    }
+
+    // Compare the expected and actual outcomes.
+    if string(expected) != actual {
+        t.Errorf("Expected and actual task JSON strings do not match.\nExpected: %s\nActual: %s", string(expected), actual)
+    }
+}
+
+func Test_GetTasksByRealm(t *testing.T) {
+    
+    // mocking the tasks based on previous tests
+    // TODO: add isolation?
+    tasksInAssessRealm := []Task{
+        {Id: "1", RealmId: "1", Body: "First task"},
+        {Id: "2", Body: "Edited content", RealmId: "1"},
+    }
+
+    tasksInDecideRealm := []Task{
+        {Id: "3", Body: "First content", RealmId: "2"},
+    }
+
+    // Manually marshal the known tasks to create the expected outcome.
+    tasksObjectAssess := TasksObject{Tasks: tasksInAssessRealm}
+    expected, err := tasksObjectAssess.MarshalJSON()
+    if err != nil {
+        t.Fatalf("Failed to manually marshal tasks in Assess: %v", err)
+    }
+
+    // Execute GetAllTasks() to get the actual outcome.
+    actual, err := GetTasksByRealm("1")
+    if err != nil {
+        t.Fatalf("GetTasksByRealm('1') failed with error: %v", err)
     }
 
     // Compare the expected and actual outcomes.
