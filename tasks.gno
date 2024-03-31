@@ -149,14 +149,83 @@ func GetTaskById(taskId string) (t Task, err error) {
 
 func GetAllTasks() (tasks string, err error) {
 	// implementation
+	var allTasks []Task
+
+	// Iterate over the Tasks AVL tree to collect all Task objects.
+	Tasks.Iterate("", "", func(key string, value interface{}) bool {
+		if task, ok := value.(Task); ok {
+			allTasks = append(allTasks, task)
+		}
+		return false // Continue iteration until all nodes have been visited.
+	})
+
+	// Create a TasksObject with all collected tasks.
+	tasksObject := &TasksObject{
+		Tasks: allTasks,
+	}
+
+	// Use the custom MarshalJSON method to marshal the tasks into JSON.
+	marshalledTasks, merr := tasksObject.MarshalJSON()
+	if merr != nil {
+		return "", merr
+	} 
+	return string(marshalledTasks), nil
 }
 
 func GetTasksByRealm(realmId string) (tasks string, err error) {
 	// implementation
+	var realmTasks []Task
+
+	// Iterate over the Tasks AVL tree to collect all Task objects.
+	
+	Tasks.Iterate("", "", func(key string, value interface{}) bool {
+		if task, ok := value.(Task); ok {
+			if task.RealmId == realmId {
+				realmTasks = append(realmTasks, task)
+			}
+		}
+		return true // Continue iteration until all nodes have been visited.
+	})
+
+	// Create a TasksObject with all collected tasks.
+	tasksObject := TasksObject{
+		Tasks: realmTasks,
+	}
+
+	// Use the custom MarshalJSON method to marshal the tasks into JSON.
+	marshalledTasks, merr := tasksObject.MarshalJSON()
+	if merr != nil {
+		return "", err
+	} 
+	return string(marshalledTasks), nil
 }
 
 func GetTasksByContext(contextId string) (tasks string, err error) {
 	// implementation
+	var contextTasks []Task
+
+	// Iterate over the Tasks AVL tree to collect all Task objects.
+	
+	Tasks.Iterate("", "", func(key string, value interface{}) bool {
+		if task, ok := value.(Task); ok {
+			if task.ContextId == contextId {
+				contextTasks = append(contextTasks, task)
+			}
+		}
+		return true // Continue iteration until all nodes have been visited.
+	})
+
+	// Create a TasksObject with all collected tasks.
+	tasksObject := TasksObject{
+		Tasks: contextTasks,
+	}
+
+	// Use the custom MarshalJSON method to marshal the tasks into JSON.
+	marshalledTasks, merr := tasksObject.MarshalJSON()
+	if merr != nil {
+		return "", err
+	} 
+	return string(marshalledTasks), nil
 }
 
 func GetTasksByDate(taskDate string) (tasks string, err error) {

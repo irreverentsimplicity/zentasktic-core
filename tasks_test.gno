@@ -8,7 +8,7 @@ import (
 
 func Test_AddTask(t *testing.T) {
     
-    task := Task{Id: "1", RealmId: "1"}
+    task := Task{Id: "1", RealmId: "1", Body: "First task",}
 
     // Test adding a task successfully.
     err := task.AddTask()
@@ -49,7 +49,7 @@ func Test_EditTask(t *testing.T) {
 
 func Test_MoveTaskToRealm(t *testing.T) {
     
-    task := Task{Id: "4", Body: "First content", RealmId: "1"}
+    task := Task{Id: "3", Body: "First content", RealmId: "1"}
 
     // Test adding a task successfully.
     err := task.AddTask()
@@ -72,10 +72,7 @@ func Test_MoveTaskToRealm(t *testing.T) {
 
 
 func Test_AttachTaskToProject(t *testing.T) {
-    // Initialize or mock Projects and ProjectTasks AVL trees
-    //Projects := avl.NewTree()
-    //ProjectTasks := avl.NewTree()
-
+    
     // Example Projects and Tasks
     prj := Project{Id: "1", Body: "Project 1", RealmId: "1"}
     tsk := Task{Id: "4", Body: "Task 4", RealmId: "1"}
@@ -140,8 +137,8 @@ func TestDetachTaskFromProject(t *testing.T) {
 	
 	// Setup:
 	project := Project{Id: "p1", Body: "Test Project"}
-	task1 := Task{Id: "t1", Body: "Task One"}
-	task2 := Task{Id: "t2", Body: "Task Two"}
+	task1 := Task{Id: "5", Body: "Task One"}
+	task2 := Task{Id: "6", Body: "Task Two"}
 
 	Projects.Set(project.Id, project)
 	ProjectTasks.Set(project.Id, []Task{task1, task2})
@@ -202,4 +199,42 @@ func TestDetachTaskFromProject(t *testing.T) {
 			}
 		})
 	}
+}
+
+func Test_GetAllTasks(t *testing.T) {
+    
+    knownTasks := []Task{
+        {Id: "1", RealmId: "1", Body: "First task"},
+        {Id: "2", Body: "First content", RealmId: "1"},
+        {Id: "3", Body: "Edited content", RealmId: "1"},
+    }
+
+    /*
+    for _, task := range knownTasks {
+        //Tasks.Set(task.Id, task)
+        task.AddTask()
+    }*/
+
+    // Verify that both tasks have been added.
+    if Tasks.Size() != len(knownTasks) {
+        t.Errorf("Expected AVL tree size to be %d, got %d", len(knownTasks), Tasks.Size())
+    }
+
+    // Manually marshal the known tasks to create the expected outcome.
+    tasksObject := TasksObject{Tasks: knownTasks}
+    expected, err := tasksObject.MarshalJSON()
+    if err != nil {
+        t.Fatalf("Failed to manually marshal known tasks: %v", err)
+    }
+
+    // Execute GetAllTasks() to get the actual outcome.
+    actual, err := GetAllTasks()
+    if err != nil {
+        t.Fatalf("GetAllTasks() failed with error: %v", err)
+    }
+
+    // Compare the expected and actual outcomes.
+    if string(expected) != actual {
+        t.Errorf("Expected and actual task JSON strings do not match.\nExpected: %s\nActual: %s", string(expected), actual)
+    }
 }
