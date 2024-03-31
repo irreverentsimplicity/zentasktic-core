@@ -135,3 +135,71 @@ func Test_AttachTaskToProject(t *testing.T) {
         })
     }
 }
+
+func TestDetachTaskFromProject(t *testing.T) {
+	
+	// Setup:
+	project := Project{Id: "p1", Body: "Test Project"}
+	task1 := Task{Id: "t1", Body: "Task One"}
+	task2 := Task{Id: "t2", Body: "Task Two"}
+
+	Projects.Set(project.Id, project)
+	ProjectTasks.Set(project.Id, []Task{task1, task2})
+
+	tests := []struct {
+		name       string
+		task       Task
+		project    Project
+		wantErr    bool
+		expectedErr error
+	}{
+		{
+			name:       "Detach existing task from project",
+			task:       task1,
+			project:    project,
+			wantErr:    false,
+			expectedErr: nil,
+		},
+		{
+			name:       "Try to detach task from non-existing project",
+			task:       task1,
+			project:    Project{Id: "nonexistent"},
+			wantErr:    true,
+			expectedErr: ErrProjectIdNotFound,
+		},
+		{
+			name:       "Try to detach non-existing task from project",
+			task:       Task{Id: "nonexistent"},
+			project:    project,
+			wantErr:    true,
+			expectedErr: ErrTaskByIdNotFound,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.task.DetachTaskFromProject(tt.project)
+
+			if tt.wantErr {
+				if err == nil || err != tt.expectedErr {
+					t.Errorf("%s: expected error %v, got %v", tt.name, tt.expectedErr, err)
+				}
+			} else {
+				if err != nil {
+					t.Errorf("%s: unexpected error: %v", tt.name, err)
+				}
+
+				// For successful detachment, verify the task is no longer part of the project's tasks
+				if !tt.wantErr {
+					tasks, _ := ProjectTasks.Get(tt.project.Id)
+					for _, task := range tasks.([]Task) {
+						if task.Id == tt.task.Id {
+							t.Errorf("%s: task was not detached from the project", tt.name)
+							break
+						}
+					}
+				}
+			}
+		})
+	}
+}

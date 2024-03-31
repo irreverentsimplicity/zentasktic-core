@@ -109,13 +109,6 @@ func (t Task) DetachTaskFromProject(p Project) (err error) {
 	if !texist {
 		// If the project has no tasks yet, return appropriate error
 		return ErrProjectTasksNotFound
-	} else {
-		tasks, ok := existingProjectTasks.([]Task)
-		// redundant check?
-		if !ok {
-			return ErrProjectTasksNotFound
-		}
-		existingProjectTasks = tasks
 	}
 
 	// Find the index of the task to be removed.
