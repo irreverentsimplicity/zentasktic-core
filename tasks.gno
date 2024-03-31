@@ -67,18 +67,18 @@ func (t Task) MoveTaskToRealm(realmId string) (err error) {
 	return nil
 }
 
-/*
+
 func (t Task) AttachTaskToProject(p Project) error {
 	// implementation
 	if Projects.Size() != 0 {
-		existingProject, perr := Projects.Get(p.Id)
-		if perr != nil {
+		existingProject, exist := Projects.Get(p.Id)
+		if !exist {
 			return ErrProjectIdNotFound
 		}
 	}
 
-	existingProjectTasks, pterr := ProjectTasks.Get(p.Id)
-	if pterr != nil {
+	existingProjectTasks, texist := ProjectTasks.Get(p.Id)
+	if !texist {
 		// If the project has no tasks yet, initialize the slice.
 		existingProjectTasks = []Task{}
 	} else {
@@ -96,9 +96,49 @@ func (t Task) AttachTaskToProject(p Project) error {
 	return nil
 }
 
-func (Task t) DetachTaskFromProject(p Project) (err error) {
+func (t Task) DetachTaskFromProject(p Project) (err error) {
 	// implementation
-}*/
+	if Projects.Size() != 0 {
+		existingProject, exist := Projects.Get(p.Id)
+		if !exist {
+			return ErrProjectIdNotFound
+		}
+	}
+
+	existingProjectTasks, texist := ProjectTasks.Get(p.Id)
+	if !texist {
+		// If the project has no tasks yet, return appropriate error
+		return ErrProjectTasksNotFound
+	} else {
+		tasks, ok := existingProjectTasks.([]Task)
+		// redundant check?
+		if !ok {
+			return ErrProjectTasksNotFound
+		}
+		existingProjectTasks = tasks
+	}
+
+	// Find the index of the task to be removed.
+	var index int = -1
+	for i, task := range existingProjectTasks.([]Task) {
+		if task.Id == t.Id {
+			index = i
+			break
+		}
+	}
+
+	// If the task was found, we remove it from the slice.
+	if index != -1 {
+		existingProjectTasks = append(existingProjectTasks.([]Task)[:index], existingProjectTasks.([]Task)[index+1:]...)
+	} else {
+		// Task not found in the project
+		return ErrTaskByIdNotFound 
+	}
+
+	ProjectTasks.Set(p.Id, existingProjectTasks)
+
+	return nil
+}
 
 // getters
 

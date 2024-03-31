@@ -62,7 +62,7 @@ func () AddContextToTask(string contextId, string taskId) (err error) {
 		return terr
 	}
 	// check if context exists
-	context, cerr := contexts.Get(contextId)
+	context, cerr := .Get(contextId)
 	if cerr != nil {
 		return cerr
 	}
