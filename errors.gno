@@ -11,4 +11,5 @@ var (
 	ErrTaskIdAlreadyExists			= errors.New("A task with the provided id already exists")
 	ErrTaskByIdNotFound				= errors.New("Can't get task by id")
 	ErrTaskNotInAssessRealm			= errors.New("Task is not in Assess, cannot be edited")
+	ErrContextIdAlreadyExists		= errors.New("A context with the provided id already exists")
 )

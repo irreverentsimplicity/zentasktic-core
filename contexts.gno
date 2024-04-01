@@ -19,17 +19,19 @@ var (
 )
 
 // actions
-/*
-func () AddContext(string contextId, string contextName) (err error) {
+
+func (c Context) AddContext() (err error) {
 	// implementation
-	newContext := &Context{
-		ID: contextId,
-		Name: contextName,
+	if Contexts.Size() != 0 {
+		existingContext, exist := Contexts.Get(c.Id)
+		if exist {
+			return ErrContextIdAlreadyExists
+		}
 	}
-	Contexts.Set(contextId, newContext)
+	Contexts.Set(c.Id, c)
 	return nil
 }
-
+/*
 
 func () EditContext(string contextId, string newContextName) (err error){
 	context, err = contexts.Get(contextId)
