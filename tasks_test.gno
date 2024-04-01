@@ -8,7 +8,7 @@ import (
 
 func Test_AddTask(t *testing.T) {
     
-    task := Task{Id: "1", RealmId: "1", Body: "First task",}
+    task := Task{Id: "1", RealmId: "1", Body: "First task", ContextId: "1"}
 
     // Test adding a task successfully.
     err := task.AddTask()
@@ -26,7 +26,7 @@ func Test_AddTask(t *testing.T) {
 
 func Test_EditTask(t *testing.T) {
     
-    task := Task{Id: "2", Body: "First content", RealmId: "1"}
+    task := Task{Id: "2", Body: "First content", RealmId: "1", ContextId: "2"}
 
     // Test adding a task successfully.
     err := task.AddTask()
@@ -35,7 +35,7 @@ func Test_EditTask(t *testing.T) {
     }
 
     // Test editing the task
-    editedTask := Task{Id: task.Id, Body: "Edited content", RealmId: task.RealmId}
+    editedTask := Task{Id: task.Id, Body: "Edited content", RealmId: task.RealmId, ContextId: "2"}
     cerr := editedTask.EditTask()
     if cerr != nil {
         t.Errorf("Failed to edit the task")
@@ -49,7 +49,7 @@ func Test_EditTask(t *testing.T) {
 
 func Test_MoveTaskToRealm(t *testing.T) {
     
-    task := Task{Id: "3", Body: "First content", RealmId: "1"}
+    task := Task{Id: "3", Body: "First content", RealmId: "1", ContextId: "1"}
 
     // Test adding a task successfully.
     err := task.AddTask()
@@ -206,9 +206,9 @@ func Test_GetAllTasks(t *testing.T) {
     // mocking the tasks based on previous tests
     // TODO: add isolation?
     knownTasks := []Task{
-        {Id: "1", RealmId: "1", Body: "First task"},
-        {Id: "2", Body: "Edited content", RealmId: "1"},
-        {Id: "3", Body: "First content", RealmId: "2"},
+        {Id: "1", RealmId: "1", Body: "First task", ContextId: "1",},
+        {Id: "2", Body: "Edited content", RealmId: "1", ContextId: "2",},
+        {Id: "3", Body: "First content", RealmId: "2", ContextId: "1",},
     }
 
     // Manually marshal the known tasks to create the expected outcome.
@@ -235,12 +235,8 @@ func Test_GetTasksByRealm(t *testing.T) {
     // mocking the tasks based on previous tests
     // TODO: add isolation?
     tasksInAssessRealm := []Task{
-        {Id: "1", RealmId: "1", Body: "First task"},
-        {Id: "2", Body: "Edited content", RealmId: "1"},
-    }
-
-    tasksInDecideRealm := []Task{
-        {Id: "3", Body: "First content", RealmId: "2"},
+        {Id: "1", RealmId: "1", Body: "First task", ContextId: "1",},
+        {Id: "2", Body: "Edited content", RealmId: "1", ContextId: "2",},
     }
 
     // Manually marshal the known tasks to create the expected outcome.
@@ -250,10 +246,36 @@ func Test_GetTasksByRealm(t *testing.T) {
         t.Fatalf("Failed to manually marshal tasks in Assess: %v", err)
     }
 
-    // Execute GetAllTasks() to get the actual outcome.
     actual, err := GetTasksByRealm("1")
     if err != nil {
         t.Fatalf("GetTasksByRealm('1') failed with error: %v", err)
+    }
+
+    // Compare the expected and actual outcomes.
+    if string(expected) != actual {
+        t.Errorf("Expected and actual task JSON strings do not match.\nExpected: %s\nActual: %s", string(expected), actual)
+    }
+}
+
+func Test_GetTasksByContext(t *testing.T) {
+    
+    // mocking the tasks based on previous tests
+    // TODO: add isolation?
+    tasksInContextOne := []Task{
+        {Id: "1", RealmId: "1", Body: "First task", ContextId: "1",},
+        {Id: "3", Body: "First content", RealmId: "2", ContextId: "1",},
+    }
+
+    // Manually marshal the known tasks to create the expected outcome.
+    tasksObjectForContexts := TasksObject{Tasks: tasksInContextOne}
+    expected, err := tasksObjectForContexts.MarshalJSON()
+    if err != nil {
+        t.Fatalf("Failed to manually marshal tasks for ContextId 1: %v", err)
+    }
+
+    actual, err := GetTasksByContext("1")
+    if err != nil {
+        t.Fatalf("GetTasksByContext('1') failed with error: %v", err)
     }
 
     // Compare the expected and actual outcomes.
