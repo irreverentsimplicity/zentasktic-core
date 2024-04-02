@@ -64,7 +64,6 @@ func (c Context) RemoveContext() (err error) {
 
 func (c Context) AddContextToTask(t Task) (err error) {
 	// implementation
-
 	// check if task exists
 	task, exist := Tasks.Get(t.Id)
 	if !exist {
@@ -76,19 +75,11 @@ func (c Context) AddContextToTask(t Task) (err error) {
 		return ErrContextIdNotFound
 	}
 
-	editedTask := &Task {
-		Id: t.Id,
-		ProjectId: t.ProjectId,
-		ContextId: c.Id,
-		RealmId: t.RealmId,
-		Body: t.Body,
-		Due: t.Due,
-		Alert: t.Alert,
-	}
 	// check to see if task is in RealmId = 2 (Decide)
 	// we can only add resources in Decide
 	if t.RealmId == "2" {
-		Tasks.Set(t.Id, editedTask)
+		task.(Task).ContextId = c.Id
+		Tasks.Set(t.Id, task.(Task))
 	} else {
 		return ErrTaskNotEditable
 	}
