@@ -207,6 +207,7 @@ func Test_GetAllTasks(t *testing.T) {
     // TODO: add isolation?
     knownTasks := []Task{
         {Id: "1", RealmId: "1", Body: "First task", ContextId: "1",},
+        {Id: "10", Body: "First content", RealmId: "2", ContextId: "2",},
         {Id: "2", Body: "Edited content", RealmId: "1", ContextId: "2",},
         {Id: "3", Body: "First content", RealmId: "2", ContextId: "1",},
     }
