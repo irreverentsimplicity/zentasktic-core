@@ -39,6 +39,7 @@ func (t Task) AddTask() (err error) {
 
 func (t Task) EditTask() (err error) {
 	// implementation, get task by Id and replace the object
+	existingTask := Task{}
 	if Tasks.Size() != 0 {
 		existingTask, exist := Tasks.Get(t.Id)
 		if !exist {
@@ -46,14 +47,18 @@ func (t Task) EditTask() (err error) {
 		}
 	}
 	
+	// task Body is editable only when task is in Assess, RealmId = "1"
 	if t.RealmId != "1" {
-		return ErrTaskNotInAssessRealm
+		if t.Body != existingTask.Body {
+			return ErrTaskNotInAssessRealm
+		}
 	}
 
 	Tasks.Set(t.Id, t)
 	return nil
 }
 
+// helper function, we can achieve the same with EditTask() above
 func (t Task) MoveTaskToRealm(realmId string) (err error) {
 	// implementation
 	if Tasks.Size() != 0 {

@@ -31,64 +31,72 @@ func (c Context) AddContext() (err error) {
 	Contexts.Set(c.Id, c)
 	return nil
 }
-/*
 
-func () EditContext(string contextId, string newContextName) (err error){
-	context, err = contexts.Get(contextId)
-	if err != nil {
-		return err
+func (c Context) EditContext() (err error){
+	if Contexts.Size() != 0 {
+		existingContext, exist := Contexts.Get(c.Id)
+		if !exist {
+			return ErrContextIdNotFound
+		}
 	}
-	editedContext := &Context{
-		ID: contextId,
-		Name: newContextName,
-	}
-	Contexts.Set(contextId, editedContext)
+	
+	Contexts.Set(c.Id, c)
 	return nil
 }
 
-func () RemoveContext(string contextId) (err error) {
+
+func (c Context) RemoveContext() (err error) {
 	// implementation
-	context, err = contexts.Get(contextId)
-	if err != nil {
-		return err
+	if Contexts.Size() != 0 {
+		context, exist := Contexts.Get(c.Id)
+		if !exist {
+			return ErrContextIdNotFound
+		}
 	}
-	Contexts.Remove(contextId)
+
+	_, removed := Contexts.Remove(c.Id)
+	if !removed {
+		return ErrContextNotRemoved
+	}
+	return nil
 }
 
-func () AddContextToTask(string contextId, string taskId) (err error) {
+
+func (c Context) AddContextToTask(t Task) (err error) {
 	// implementation
 
 	// check if task exists
-	task, terr := tasks.Get(taskId)
-	if terr != nil {
-		return terr
+	task, exist := Tasks.Get(t.Id)
+	if !exist {
+		return ErrTaskIdNotFound
 	}
 	// check if context exists
-	context, cerr := .Get(contextId)
-	if cerr != nil {
-		return cerr
+	context, cexist := Contexts.Get(c.Id)
+	if !cexist {
+		return ErrContextIdNotFound
 	}
 
 	editedTask := &Task {
-		Id: task.Id
-		ProjectId: task.ProjectId
-		ContextId: contextId
-		RealmId: task.RealmId
-		Body: task.Body
-		Due: task.Due
-		Alert: task.Alert
+		Id: t.Id,
+		ProjectId: t.ProjectId,
+		ContextId: c.Id,
+		RealmId: t.RealmId,
+		Body: t.Body,
+		Due: t.Due,
+		Alert: t.Alert,
 	}
-	// check to see if task is editable -> RealmId = 1 (Assess)
-	if editedTask.RealmId == 1 {
-		Tasks.Set(taskId, editedTask)
-	}
-	else {
+	// check to see if task is in RealmId = 2 (Decide)
+	// we can only add resources in Decide
+	if t.RealmId == "2" {
+		Tasks.Set(t.Id, editedTask)
+	} else {
 		return ErrTaskNotEditable
 	}
 
 	return nil
 }
 
+/*
 func () AddContextToProject(string contextId, string projectId) (err error) {
 	// check if project exists
 	project, perr := projects.Get(projectId)
@@ -118,9 +126,20 @@ func () AddContextToProject(string contextId, string projectId) (err error) {
 	
 	return nil
 }
-
+*/
 // getters
 
+func GetContextById(contextId string) (c Context, err error) {
+	if Contexts.Size() != 0 {
+		c, exist := Contexts.Get(contextId)
+		if exist {
+			return c.(Context), nil
+		} else {
+			return nil, ErrContextIdNotFound
+		}
+	}
+}
+/*
 func () GetContexts() (contexts string, err error) {
 	// implementation
 	

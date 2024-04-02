@@ -23,30 +23,48 @@ func Test_AddContext(t *testing.T) {
     }
 }
 
-/*
-func Test_EditTask(t *testing.T) {
+
+func Test_EditContext(t *testing.T) {
     
-    task := Task{Id: "2", Body: "First content", RealmId: "1", ContextId: "2"}
+    context := Context{Id: "2", Name: "Home"}
 
-    // Test adding a task successfully.
-    err := task.AddTask()
+    // Test adding a context successfully.
+    err := context.AddContext()
     if err != nil {
-        t.Errorf("Failed to add task: %v", err)
+        t.Errorf("Failed to add context: %v", err)
     }
 
-    // Test editing the task
-    editedTask := Task{Id: task.Id, Body: "Edited content", RealmId: task.RealmId, ContextId: "2"}
-    cerr := editedTask.EditTask()
+    // Test editing the context
+    editedContext := Context{Id: "2", Name: "Shopping"}
+    cerr := editedContext.EditContext()
     if cerr != nil {
-        t.Errorf("Failed to edit the task")
+        t.Errorf("Failed to edit the context")
     }
 
-    retrievedTask, _ := GetTaskById(editedTask.Id)
-    if retrievedTask.Body != "Edited content" {
-        t.Errorf("Task was not edited")
+    retrievedContext, _ := GetContextById(editedContext.Id)
+    if retrievedContext.Name != "Shopping" {
+        t.Errorf("Context was not edited")
     }
 }
 
+func Test_RemoveContext(t *testing.T) {
+    
+    context := Context{Id: "3", Name: "School"}
+
+    // Test adding a context successfully.
+    err := context.AddContext()
+    if err != nil {
+        t.Errorf("Failed to add context: %v", err)
+    }
+
+    // Test removing a context
+    cerr := context.RemoveContext()
+    if cerr != nil {
+        t.Errorf("Expected ErrContextNotRemoved, got %v", cerr)
+    }
+}
+
+/*
 func Test_MoveTaskToRealm(t *testing.T) {
     
     task := Task{Id: "3", Body: "First content", RealmId: "1", ContextId: "1"}
@@ -282,4 +300,4 @@ func Test_GetTasksByContext(t *testing.T) {
     if string(expected) != actual {
         t.Errorf("Expected and actual task JSON strings do not match.\nExpected: %s\nActual: %s", string(expected), actual)
     }
-}*/
+}*/ 
