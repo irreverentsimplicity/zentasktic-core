@@ -47,6 +47,7 @@ func (c Context) EditContext() (err error){
 
 func (c Context) RemoveContext() (err error) {
 	// implementation
+	context := Context{}
 	if Contexts.Size() != 0 {
 		context, exist := Contexts.Get(c.Id)
 		if !exist {
@@ -54,7 +55,7 @@ func (c Context) RemoveContext() (err error) {
 		}
 	}
 
-	_, removed := Contexts.Remove(c.Id)
+	_, removed := Contexts.Remove(context.(Context).Id)
 	if !removed {
 		return ErrContextNotRemoved
 	}
@@ -116,8 +117,9 @@ func () AddContextToProject(string contextId, string projectId) (err error) {
 	}
 	
 	return nil
-}
-*/
+}*/
+
+
 // getters
 
 func GetContextById(contextId string) (c Context, err error) {
@@ -144,12 +146,12 @@ func GetAllContexts() (contexts string, err error) {
 	})
 
 
-	// Create a TasksObject with all collected tasks.
+	// Create a ContextsObject with all collected contexts.
 	contextsObject := &ContextsObject{
 		Contexts: allContexts,
 	}
 
-	// Use the custom MarshalJSON method to marshal the tasks into JSON.
+	// Use the custom MarshalJSON method to marshal the contexts into JSON.
 	marshalledContexts, merr := contextsObject.MarshalJSON()
 	if merr != nil {
 		return "", merr

@@ -48,7 +48,7 @@ func Test_EditContext(t *testing.T) {
 
 func Test_RemoveContext(t *testing.T) {
     
-    context := Context{Id: "4", Name: "Gym"}
+    context := Context{Id: "4", Name: "Gym",}
 
     // Test adding a context successfully.
     err := context.AddContext()
@@ -56,9 +56,13 @@ func Test_RemoveContext(t *testing.T) {
         t.Errorf("Failed to add context: %v", err)
     }
 
+    retrievedContext, rerr := GetContextById(context.Id)
+    if rerr != nil {
+        t.Errorf("Could not retrieve the added context")
+    }
     // Test removing a context
-    cerr := context.RemoveContext()
-    if cerr != nil {
+    cerr := retrievedContext.RemoveContext()
+    if cerr != ErrContextNotRemoved {
         t.Errorf("Expected ErrContextNotRemoved, got %v", cerr)
     }
 }
@@ -95,6 +99,7 @@ func Test_GetAllContexts(t *testing.T) {
     knownContexts := []Context{
         {Id: "1", Name: "Work",},
         {Id: "2", Name: "Shopping",},
+        {Id: "4", Name: "Gym",},
     }
 
     // Manually marshal the known contexts to create the expected outcome.

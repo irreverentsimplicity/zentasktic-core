@@ -36,6 +36,28 @@ func (t Task) AddTask() (err error) {
 	return nil
 }
 
+func (t Task) RemoveTask() (err error) {
+	// implementation
+	existingTask := Task{}
+	if Tasks.Size() != 0 {
+		existingTask, exist := Tasks.Get(t.Id)
+		if !exist {
+			return ErrTaskIdNotFound
+		}
+	}
+	
+	// task is removable only in Asses (RealmId 1) or via a Collection (RealmId 4)
+	if t.RealmId != "1" && t.RealmId != "4" {
+		return ErrTaskNotRemovable
+	}
+
+	_, removed := Tasks.Remove(existingTask.Id)
+	if !removed {
+		return ErrTaskNotRemoved
+	}
+	return nil
+}
+
 
 func (t Task) EditTask() (err error) {
 	// implementation, get task by Id and replace the object

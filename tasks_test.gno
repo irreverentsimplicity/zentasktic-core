@@ -23,6 +23,28 @@ func Test_AddTask(t *testing.T) {
     }
 }
 
+func Test_RemoveTask(t *testing.T) {
+    
+    task := Task{Id: "20", Body: "Removable task", RealmId: "1"}
+
+    // Test adding a task successfully.
+    err := task.AddTask()
+    if err != nil {
+        t.Errorf("Failed to add task: %v", err)
+    }
+
+    retrievedTask, rerr := GetTaskById(task.Id)
+    if rerr != nil {
+        t.Errorf("Could not retrieve the added task")
+    }
+
+    // Test removing a task
+    terr := retrievedTask.RemoveTask()
+    if terr != ErrTaskNotRemoved {
+        t.Errorf("Expected ErrTaskNotRemoved, got %v", terr)
+    }
+}
+
 
 func Test_EditTask(t *testing.T) {
     
@@ -209,6 +231,7 @@ func Test_GetAllTasks(t *testing.T) {
         {Id: "1", RealmId: "1", Body: "First task", ContextId: "1",},
         {Id: "10", Body: "First content", RealmId: "2", ContextId: "2",},
         {Id: "2", Body: "Edited content", RealmId: "1", ContextId: "2",},
+        {Id: "20", Body: "Removable task", RealmId: "1",},
         {Id: "3", Body: "First content", RealmId: "2", ContextId: "1",},
     }
 
@@ -238,6 +261,7 @@ func Test_GetTasksByRealm(t *testing.T) {
     tasksInAssessRealm := []Task{
         {Id: "1", RealmId: "1", Body: "First task", ContextId: "1",},
         {Id: "2", RealmId: "1", Body: "Edited content", ContextId: "2",},
+        {Id: "20", Body: "Removable task", RealmId: "1",},
     }
 
     // Manually marshal the known tasks to create the expected outcome.
