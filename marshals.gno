@@ -47,6 +47,7 @@ func (cs ContextsObject) MarshalJSON() ([]byte, error) {
 	var b bytes.Buffer
 
 	b.WriteString(`{"contexts":[`)
+	
 	for i, context := range cs.Contexts {
 		if i > 0 {
 			b.WriteString(`,`)
@@ -56,6 +57,7 @@ func (cs ContextsObject) MarshalJSON() ([]byte, error) {
 			b.WriteString(string(contextJSON))
 		}
 	}
+
 	b.WriteString(`]}`)
 
 	return b.Bytes(), nil

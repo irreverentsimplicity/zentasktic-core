@@ -130,8 +130,29 @@ func GetContextById(contextId string) (c Context, err error) {
 		}
 	}
 }
-/*
-func () GetContexts() (contexts string, err error) {
+
+func GetAllContexts() (contexts string, err error) {
 	// implementation
-	
-}*/
+	var allContexts []Context
+
+	// Iterate over the Context AVL tree to collect all Context objects.
+	Contexts.Iterate("", "", func(key string, value interface{}) bool {
+		if context, ok := value.(Context); ok {
+			allContexts = append(allContexts, context)
+		}
+		return false // Continue iteration until all nodes have been visited.
+	})
+
+
+	// Create a TasksObject with all collected tasks.
+	contextsObject := &ContextsObject{
+		Contexts: allContexts,
+	}
+
+	// Use the custom MarshalJSON method to marshal the tasks into JSON.
+	marshalledContexts, merr := contextsObject.MarshalJSON()
+	if merr != nil {
+		return "", merr
+	} 
+	return string(marshalledContexts), nil
+}
