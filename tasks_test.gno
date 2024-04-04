@@ -8,7 +8,7 @@ import (
 
 func Test_AddTask(t *testing.T) {
     
-    task := Task{Id: "1", RealmId: "1", Body: "First task", ContextId: "1"}
+    task := Task{Id: "1", RealmId: "1", Body: "First task", ContextId: "1",}
 
     // Test adding a task successfully.
     err := task.AddTask()

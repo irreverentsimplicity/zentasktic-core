@@ -78,7 +78,6 @@ func (p Project) RemoveProject() (err error) {
 	return nil
 }
 
-
 func (p Project) EditProject() (err error) {
 	// implementation, get project by Id and replace the object
 	// this is for the project body and realm, project tasks are managed in the Tasks object
@@ -114,7 +113,6 @@ func (p Project) MoveProjectToRealm(realmId string) (err error) {
 	}
 	return nil
 }
-
 
 func (p Project) GetProjectTasks() (tasks []Task, err error) {
 	// implementation, query ProjectTasks and return the []Tasks object

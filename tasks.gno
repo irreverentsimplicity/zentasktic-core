@@ -95,7 +95,7 @@ func (t Task) MoveTaskToRealm(realmId string) (err error) {
 }
 
 
-func (t Task) AttachTaskToProject(p Project) error {
+func (t Task) AttachTaskToProject(p Project) (err error) {
 	// implementation
 	if Projects.Size() != 0 {
 		existingProject, exist := Projects.Get(p.Id)
@@ -115,7 +115,8 @@ func (t Task) AttachTaskToProject(p Project) error {
 		}
 		existingProjectTasks = tasks
 	}
-
+	t.ProjectId = p.Id
+	t.EditTask()
 	updatedTasks := append(existingProjectTasks.([]Task), t)
 
 	ProjectTasks.Set(p.Id, updatedTasks)
@@ -154,7 +155,8 @@ func (t Task) DetachTaskFromProject(p Project) (err error) {
 		// Task not found in the project
 		return ErrTaskByIdNotFound 
 	}
-
+	t.ProjectId = ""
+	t.EditTask()
 	ProjectTasks.Set(p.Id, existingProjectTasks)
 
 	return nil

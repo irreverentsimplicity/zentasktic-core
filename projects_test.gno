@@ -125,6 +125,38 @@ func Test_GetAllProjects(t *testing.T) {
     }
 }
 
+func Test_GetProjectTasks(t *testing.T){
+    
+    task := Task{Id: "1", RealmId: "1", Body: "First task", ContextId: "1",}
+
+    project, perr := GetProjectById("1")
+    if perr != nil {
+        t.Errorf("GetProjectById() failed, %v", perr)
+    }
+
+    // test attaching to an existing project
+    atterr := task.AttachTaskToProject(project)
+    if atterr != nil {
+        t.Errorf("AttachTaskToProject() failed, %v", atterr)
+    }
+
+    projectTasks, pterr := project.GetProjectTasks()
+    if len(projectTasks) == 0 {
+        t.Errorf("GetProjectTasks() failed, %v", pterr)
+    }
+
+    // test detaching from an existing project
+    dtterr := task.DetachTaskFromProject(project)
+    if dtterr != nil {
+        t.Errorf("DetachTaskFromProject() failed, %v", dtterr)
+    }
+
+    projectWithNoTasks, pterr := project.GetProjectTasks()
+    if len(projectWithNoTasks) != 0 {
+        t.Errorf("GetProjectTasks() after detach failed, %v", pterr)
+    }
+}
+
 func Test_GetProjectById(t *testing.T){
     // test getting a non-existing project
     nonProject, err := GetProjectById("0")
