@@ -138,8 +138,9 @@ func (p Project) MarshalJSON() ([]byte, error) {
 	b.WriteString(p.RealmId)
 	b.WriteString(`",`)
 
-	b.WriteString(`{"projectTasks":[`)
-	if len(p.Tasks) > 0 {
+	b.WriteString(`"projectTasks":[`)
+
+	if len(p.Tasks) != 0 {
 		for i, projectTask := range p.Tasks {
 			if i > 0 {
 				b.WriteString(`,`)
@@ -150,6 +151,7 @@ func (p Project) MarshalJSON() ([]byte, error) {
 			}
 		}
 	}
+
 	b.WriteString(`],`)
 
 	b.WriteString(`"projectBody:"`)

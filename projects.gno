@@ -173,7 +173,7 @@ func GetAllProjects() (projects string, err error) {
 	if merr != nil {
 		return "", merr
 	} 
-	return string(projectsObject), nil
+	return string(marshalledProjects), nil
 }
 
 func GetProjectsByRealm(realmId string) (projects string, err error) {
@@ -206,7 +206,7 @@ func GetProjectsByRealm(realmId string) (projects string, err error) {
 	if merr != nil {
 		return "", merr
 	} 
-	return string(projectsObject), nil
+	return string(marshalledProjects), nil
 }
 
 func GetProjectsByContext(contextId string) (projects string, err error) {
@@ -239,7 +239,7 @@ func GetProjectsByContext(contextId string) (projects string, err error) {
 	if merr != nil {
 		return "", merr
 	} 
-	return string(projectsObject), nil
+	return string(marshalledProjects), nil
 }
 
 func GetProjectsByDate(date string) (projects string, err error) {

@@ -94,8 +94,8 @@ func Test_MoveTaskToRealm(t *testing.T) {
 func Test_AttachTaskToProject(t *testing.T) {
     
     // Example Projects and Tasks
-    prj := Project{Id: "1", Body: "Project 1", RealmId: "1"}
-    tsk := Task{Id: "4", Body: "Task 4", RealmId: "1"}
+    prj := Project{Id: "1", Body: "Project 1", RealmId: "1",}
+    tsk := Task{Id: "4", Body: "Task 4", RealmId: "1",}
 
     Projects.Set(prj.Id, prj) // Mock existing project
 
@@ -114,7 +114,7 @@ func Test_AttachTaskToProject(t *testing.T) {
         },
         {
             name:    "Attach to non-existing project",
-            project: Project{Id: "2", Body: "Project 2"},
+            project: Project{Id: "200", Body: "Project 200", RealmId: "1",},
             task:    tsk,
             wantErr: true,
             errMsg:  ErrProjectIdNotFound,

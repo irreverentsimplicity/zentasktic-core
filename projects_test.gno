@@ -8,7 +8,7 @@ import (
 
 func Test_AddProject(t *testing.T) {
     
-    project := Project{Id: "1", RealmId: "1", Body: "First project", ContextId: "1"}
+    project := Project{Id: "1", RealmId: "1", Body: "First project", ContextId: "1",}
 
     // Test adding a project successfully.
     err := project.AddProject()
@@ -26,7 +26,7 @@ func Test_AddProject(t *testing.T) {
 
 func Test_RemoveProject(t *testing.T) {
     
-    project := Project{Id: "20", Body: "Removable project", RealmId: "1"}
+    project := Project{Id: "20", Body: "Removable project", RealmId: "1", ContextId: "2",}
 
     // Test adding a project successfully.
     err := project.AddProject()
@@ -49,7 +49,7 @@ func Test_RemoveProject(t *testing.T) {
 
 func Test_EditProject(t *testing.T) {
     
-    project := Project{Id: "2", Body: "Second project content", RealmId: "1", ContextId: "2"}
+    project := Project{Id: "2", Body: "Second project content", RealmId: "1", ContextId: "2",}
 
     // Test adding a project successfully.
     err := project.AddProject()
@@ -58,7 +58,7 @@ func Test_EditProject(t *testing.T) {
     }
 
     // Test editing the project
-    editedProject := Project{Id: project.Id, Body: "Edited project content", RealmId: project.RealmId, ContextId: "2"}
+    editedProject := Project{Id: project.Id, Body: "Edited project content", RealmId: project.RealmId, ContextId: "2",}
     cerr := editedProject.EditProject()
     if cerr != nil {
         t.Errorf("Failed to edit the project")
@@ -73,7 +73,7 @@ func Test_EditProject(t *testing.T) {
 
 func Test_MoveProjectToRealm(t *testing.T) {
     
-    project := Project{Id: "3", Body: "Project id 3 content", RealmId: "1", ContextId: "1"}
+    project := Project{Id: "3", Body: "Project id 3 content", RealmId: "1", ContextId: "1",}
 
     // Test adding a project successfully.
     err := project.AddProject()
@@ -94,37 +94,36 @@ func Test_MoveProjectToRealm(t *testing.T) {
     }
 }
 
-/*
-func Test_GetAllTasks(t *testing.T) {
+
+func Test_GetAllProjects(t *testing.T) {
     
     // mocking the tasks based on previous tests
     // TODO: add isolation?
-    knownTasks := []Task{
-        {Id: "1", RealmId: "1", Body: "First task", ContextId: "1",},
-        {Id: "10", Body: "First content", RealmId: "2", ContextId: "2",},
-        {Id: "2", Body: "Edited content", RealmId: "1", ContextId: "2",},
-        {Id: "20", Body: "Removable task", RealmId: "1",},
-        {Id: "3", Body: "First content", RealmId: "2", ContextId: "1",},
+    knownProjects := []Project{
+        {Id: "1", Body: "First project", RealmId: "1", ContextId: "1",},
+		{Id: "2", Body: "Edited project content", RealmId: "1", ContextId: "2",},
+        {Id: "20", Body: "Removable project", RealmId: "1", ContextId: "2",},
+		{Id: "3", Body: "Project id 3 content", RealmId: "2", ContextId: "1",},
     }
 
-    // Manually marshal the known tasks to create the expected outcome.
-    tasksObject := TasksObject{Tasks: knownTasks}
-    expected, err := tasksObject.MarshalJSON()
+    // Manually marshal the known projects to create the expected outcome.
+    projectsObject := ProjectsObject{Projects: knownProjects}
+    expected, err := projectsObject.MarshalJSON()
     if err != nil {
-        t.Fatalf("Failed to manually marshal known tasks: %v", err)
+        t.Fatalf("Failed to manually marshal known projects: %v", err)
     }
 
-    // Execute GetAllTasks() to get the actual outcome.
-    actual, err := GetAllTasks()
+    // Execute GetAllProjects() to get the actual outcome.
+    actual, err := GetAllProjects()
     if err != nil {
-        t.Fatalf("GetAllTasks() failed with error: %v", err)
+        t.Fatalf("GetAllProjects() failed with error: %v", err)
     }
 
     // Compare the expected and actual outcomes.
     if string(expected) != actual {
-        t.Errorf("Expected and actual task JSON strings do not match.\nExpected: %s\nActual: %s", string(expected), actual)
+        t.Errorf("Expected and actual project JSON strings do not match.\nExpected: %s\nActual: %s", string(expected), actual)
     }
-}*/
+}
 
 func Test_GetProjectById(t *testing.T){
     // test getting a non-existing project
@@ -143,60 +142,59 @@ func Test_GetProjectById(t *testing.T){
         t.Fatalf("Got the wrong project, with body: %v", correctProject.Body)
     }
 }
-/*
 
-func Test_GetTasksByRealm(t *testing.T) {
+func Test_GetProjectsByRealm(t *testing.T) {
     
-    // mocking the tasks based on previous tests
+    // mocking the projects based on previous tests
     // TODO: add isolation?
-    tasksInAssessRealm := []Task{
-        {Id: "1", RealmId: "1", Body: "First task", ContextId: "1",},
-        {Id: "2", RealmId: "1", Body: "Edited content", ContextId: "2",},
-        {Id: "20", Body: "Removable task", RealmId: "1",},
+    projectsInAssessRealm := []Project{
+        {Id: "1", Body: "First project", RealmId: "1", ContextId: "1",},
+		{Id: "2", Body: "Edited project content", RealmId: "1", ContextId: "2",},
+        {Id: "20", Body: "Removable project", RealmId: "1", ContextId: "2",},
     }
 
-    // Manually marshal the known tasks to create the expected outcome.
-    tasksObjectAssess := TasksObject{Tasks: tasksInAssessRealm}
-    expected, err := tasksObjectAssess.MarshalJSON()
+    // Manually marshal the known projects to create the expected outcome.
+    projectsObjectAssess := ProjectsObject{Projects: projectsInAssessRealm}
+    expected, err := projectsObjectAssess.MarshalJSON()
     if err != nil {
-        t.Fatalf("Failed to manually marshal tasks in Assess: %v", err)
+        t.Fatalf("Failed to manually marshal projects in Assess: %v", err)
     }
 
-    actual, err := GetTasksByRealm("1")
+    actual, err := GetProjectsByRealm("1")
     if err != nil {
-        t.Fatalf("GetTasksByRealm('1') failed with error: %v", err)
+        t.Fatalf("GetProjectByRealm('1') failed with error: %v", err)
     }
 
     // Compare the expected and actual outcomes.
     if string(expected) != actual {
-        t.Errorf("Expected and actual task JSON strings do not match.\nExpected: %s\nActual: %s", string(expected), actual)
+        t.Errorf("Expected and actual projects JSON strings do not match.\nExpected: %s\nActual: %s", string(expected), actual)
     }
 }
 
-func Test_GetTasksByContext(t *testing.T) {
+func Test_GetProjectsByContext(t *testing.T) {
     
-    // mocking the tasks based on previous tests
+    // mocking the projects based on previous tests
     // TODO: add isolation?
-    tasksInContextOne := []Task{
-        {Id: "1", RealmId: "1", Body: "First task", ContextId: "1",},
-        {Id: "3", RealmId: "2", Body: "First content", ContextId: "1",},
+    projectsInContextOne := []Project{
+        {Id: "1", Body: "First project", RealmId: "1", ContextId: "1",},
+		{Id: "3", Body: "Project id 3 content", RealmId: "2", ContextId: "1",},
     }
 
     // Manually marshal the known tasks to create the expected outcome.
-    tasksObjectForContexts := TasksObject{Tasks: tasksInContextOne}
-    expected, err := tasksObjectForContexts.MarshalJSON()
+    projectsObjectForContexts := ProjectsObject{Projects: projectsInContextOne}
+    expected, err := projectsObjectForContexts.MarshalJSON()
     if err != nil {
-        t.Fatalf("Failed to manually marshal tasks for ContextId 1: %v", err)
+        t.Fatalf("Failed to manually marshal projects for ContextId 1: %v", err)
     }
 
-    actual, err := GetTasksByContext("1")
+    actual, err := GetProjectsByContext("1")
     if err != nil {
-        t.Fatalf("GetTasksByContext('1') failed with error: %v", err)
+        t.Fatalf("GetProjectsByContext('1') failed with error: %v", err)
     }
 
     // Compare the expected and actual outcomes.
     if string(expected) != actual {
-        t.Errorf("Expected and actual task JSON strings do not match.\nExpected: %s\nActual: %s", string(expected), actual)
+        t.Errorf("Expected and actual project JSON strings do not match.\nExpected: %s\nActual: %s", string(expected), actual)
     }
 }
-*/
+
