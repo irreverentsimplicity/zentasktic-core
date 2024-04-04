@@ -45,7 +45,6 @@ func Test_RemoveTask(t *testing.T) {
     }
 }
 
-
 func Test_EditTask(t *testing.T) {
     
     task := Task{Id: "2", Body: "First content", RealmId: "1", ContextId: "2"}
@@ -91,7 +90,6 @@ func Test_MoveTaskToRealm(t *testing.T) {
         t.Errorf("Task was moved to the wrong realm")
     }
 }
-
 
 func Test_AttachTaskToProject(t *testing.T) {
     
@@ -251,6 +249,24 @@ func Test_GetAllTasks(t *testing.T) {
     // Compare the expected and actual outcomes.
     if string(expected) != actual {
         t.Errorf("Expected and actual task JSON strings do not match.\nExpected: %s\nActual: %s", string(expected), actual)
+    }
+}
+
+func Test_GetTaskById(t *testing.T){
+    // test getting a non-existing task
+    nonTask, err := GetTaskById("0")
+    if err != ErrTaskByIdNotFound {
+        t.Fatalf("Expected ErrTaskByIdNotFound, got: %v", err)
+    }
+
+    // test getting the correct task by id
+    correctTask, err := GetTaskById("1")
+    if err != nil {
+        t.Fatalf("Failed to get task by id, error: %v", err)
+    }
+
+    if correctTask.Body != "First task" {
+        t.Fatalf("Got the wrong task, with body: %v", correctTask.Body)
     }
 }
 

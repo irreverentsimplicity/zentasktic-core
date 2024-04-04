@@ -222,7 +222,7 @@ func GetTasksByRealm(realmId string) (tasks string, err error) {
 	// Use the custom MarshalJSON method to marshal the tasks into JSON.
 	marshalledTasks, merr := tasksObject.MarshalJSON()
 	if merr != nil {
-		return "", err
+		return "", merr
 	} 
 	return string(marshalledTasks), nil
 }
@@ -250,7 +250,7 @@ func GetTasksByContext(contextId string) (tasks string, err error) {
 	// Use the custom MarshalJSON method to marshal the tasks into JSON.
 	marshalledTasks, merr := tasksObject.MarshalJSON()
 	if merr != nil {
-		return "", err
+		return "", merr
 	} 
 	return string(marshalledTasks), nil
 }

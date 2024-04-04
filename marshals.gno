@@ -17,11 +17,11 @@ type TasksObject struct {
 }
 
 type ProjectsObject struct {
-	Items	[]Project
+	Projects	[]Project
 }
 
 type CollectionsObject struct {
-	Items	[]Collection
+	Collections	[]Collection
 }
 
 func (c Context) MarshalJSON() ([]byte, error) {
@@ -120,7 +120,6 @@ func (ts TasksObject) MarshalJSON() ([]byte, error) {
 	return b.Bytes(), nil
 }
 
-
 func (p Project) MarshalJSON() ([]byte, error) {
 
 	var b bytes.Buffer
@@ -140,13 +139,15 @@ func (p Project) MarshalJSON() ([]byte, error) {
 	b.WriteString(`",`)
 
 	b.WriteString(`{"projectTasks":[`)
-	for i, projectTask := range p.Tasks {
-		if i > 0 {
-			b.WriteString(`,`)
-		}
-		projectTaskJSON, perr := projectTask.MarshalJSON()
-		if perr == nil {
-			b.WriteString(string(projectTaskJSON))
+	if len(p.Tasks) > 0 {
+		for i, projectTask := range p.Tasks {
+			if i > 0 {
+				b.WriteString(`,`)
+			}
+			projectTaskJSON, perr := projectTask.MarshalJSON()
+			if perr == nil {
+				b.WriteString(string(projectTaskJSON))
+			}
 		}
 	}
 	b.WriteString(`],`)
@@ -168,7 +169,7 @@ func (ps ProjectsObject) MarshalJSON() ([]byte, error) {
 	var b bytes.Buffer
 
 	b.WriteString(`{"projects":[`)
-	for i, project := range ps.Items {
+	for i, project := range ps.Projects {
 		if i > 0 {
 			b.WriteString(`,`)
 		}

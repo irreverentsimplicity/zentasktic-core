@@ -23,207 +23,78 @@ func Test_AddProject(t *testing.T) {
     }
 }
 
-/*
-func Test_RemoveTask(t *testing.T) {
-    
-    task := Task{Id: "20", Body: "Removable task", RealmId: "1"}
 
-    // Test adding a task successfully.
-    err := task.AddTask()
+func Test_RemoveProject(t *testing.T) {
+    
+    project := Project{Id: "20", Body: "Removable project", RealmId: "1"}
+
+    // Test adding a project successfully.
+    err := project.AddProject()
     if err != nil {
-        t.Errorf("Failed to add task: %v", err)
+        t.Errorf("Failed to add project: %v", err)
     }
 
-    retrievedTask, rerr := GetTaskById(task.Id)
+    retrievedProject, rerr := GetProjectById(project.Id)
     if rerr != nil {
-        t.Errorf("Could not retrieve the added task")
+        t.Errorf("Could not retrieve the added project")
     }
 
-    // Test removing a task
-    terr := retrievedTask.RemoveTask()
-    if terr != ErrTaskNotRemoved {
-        t.Errorf("Expected ErrTaskNotRemoved, got %v", terr)
+    // Test removing a project
+    terr := retrievedProject.RemoveProject()
+    if terr != ErrProjectNotRemoved {
+        t.Errorf("Expected ErrProjectNotRemoved, got %v", terr)
     }
 }
 
 
-func Test_EditTask(t *testing.T) {
+func Test_EditProject(t *testing.T) {
     
-    task := Task{Id: "2", Body: "First content", RealmId: "1", ContextId: "2"}
+    project := Project{Id: "2", Body: "Second project content", RealmId: "1", ContextId: "2"}
 
-    // Test adding a task successfully.
-    err := task.AddTask()
+    // Test adding a project successfully.
+    err := project.AddProject()
     if err != nil {
-        t.Errorf("Failed to add task: %v", err)
+        t.Errorf("Failed to add project: %v", err)
     }
 
-    // Test editing the task
-    editedTask := Task{Id: task.Id, Body: "Edited content", RealmId: task.RealmId, ContextId: "2"}
-    cerr := editedTask.EditTask()
+    // Test editing the project
+    editedProject := Project{Id: project.Id, Body: "Edited project content", RealmId: project.RealmId, ContextId: "2"}
+    cerr := editedProject.EditProject()
     if cerr != nil {
-        t.Errorf("Failed to edit the task")
+        t.Errorf("Failed to edit the project")
     }
 
-    retrievedTask, _ := GetTaskById(editedTask.Id)
-    if retrievedTask.Body != "Edited content" {
-        t.Errorf("Task was not edited")
+    retrievedProject, _ := GetProjectById(editedProject.Id)
+    if retrievedProject.Body != "Edited project content" {
+        t.Errorf("Project was not edited")
     }
 }
 
-func Test_MoveTaskToRealm(t *testing.T) {
-    
-    task := Task{Id: "3", Body: "First content", RealmId: "1", ContextId: "1"}
 
-    // Test adding a task successfully.
-    err := task.AddTask()
+func Test_MoveProjectToRealm(t *testing.T) {
+    
+    project := Project{Id: "3", Body: "Project id 3 content", RealmId: "1", ContextId: "1"}
+
+    // Test adding a project successfully.
+    err := project.AddProject()
     if err != nil {
-        t.Errorf("Failed to add task: %v", err)
+        t.Errorf("Failed to add project: %v", err)
     }
 
-    // Test moving the task to another realm
+    // Test moving the project to another realm
     
-    cerr := task.MoveTaskToRealm("2")
+    cerr := project.MoveProjectToRealm("2")
     if cerr != nil {
-        t.Errorf("Failed to move task to another realm")
+        t.Errorf("Failed to move project to another realm")
     }
 
-    retrievedTask, _ := GetTaskById(task.Id)
-    if retrievedTask.RealmId != "2" {
-        t.Errorf("Task was moved to the wrong realm")
-    }
-}
-
-
-func Test_AttachTaskToProject(t *testing.T) {
-    
-    // Example Projects and Tasks
-    prj := Project{Id: "1", Body: "Project 1", RealmId: "1"}
-    tsk := Task{Id: "4", Body: "Task 4", RealmId: "1"}
-
-    Projects.Set(prj.Id, prj) // Mock existing project
-
-    tests := []struct {
-        name    string
-        project Project
-        task    Task
-        wantErr bool
-        errMsg  error
-    }{
-        {
-            name:    "Attach to existing project",
-            project: prj,
-            task:    tsk,
-            wantErr: false,
-        },
-        {
-            name:    "Attach to non-existing project",
-            project: Project{Id: "2", Body: "Project 2"},
-            task:    tsk,
-            wantErr: true,
-            errMsg:  ErrProjectIdNotFound,
-        },
-    }
-
-    for _, tt := range tests {
-        t.Run(tt.name, func(t *testing.T) {
-            err := tt.task.AttachTaskToProject(tt.project)
-            if (err != nil) != tt.wantErr {
-                t.Errorf("AttachTaskToProject() error = %v, wantErr %v", err, tt.wantErr)
-            }
-            if tt.wantErr && err != tt.errMsg {
-                t.Errorf("AttachTaskToProject() error = %v, expected %v", err, tt.errMsg)
-            }
-
-            // For successful attach, verify the task is added to the project's tasks.
-            if !tt.wantErr {
-                tasks, exist := ProjectTasks.Get(tt.project.Id)
-                if !exist || len(tasks.([]Task)) == 0 {
-                    t.Errorf("Task was not attached to the project")
-                } else {
-                    found := false
-                    for _, task := range tasks.([]Task) {
-                        if task.Id == tt.task.Id {
-                            found = true
-                            break
-                        }
-                    }
-                    if !found {
-                        t.Errorf("Task was not attached to the project")
-                    }
-                }
-            }
-        })
+    retrievedProject, _ := GetProjectById(project.Id)
+    if retrievedProject.RealmId != "2" {
+        t.Errorf("Project was moved to the wrong realm")
     }
 }
 
-func TestDetachTaskFromProject(t *testing.T) {
-	
-	// Setup:
-	project := Project{Id: "p1", Body: "Test Project"}
-	task1 := Task{Id: "5", Body: "Task One"}
-	task2 := Task{Id: "6", Body: "Task Two"}
-
-	Projects.Set(project.Id, project)
-	ProjectTasks.Set(project.Id, []Task{task1, task2})
-
-	tests := []struct {
-		name       string
-		task       Task
-		project    Project
-		wantErr    bool
-		expectedErr error
-	}{
-		{
-			name:       "Detach existing task from project",
-			task:       task1,
-			project:    project,
-			wantErr:    false,
-			expectedErr: nil,
-		},
-		{
-			name:       "Try to detach task from non-existing project",
-			task:       task1,
-			project:    Project{Id: "nonexistent"},
-			wantErr:    true,
-			expectedErr: ErrProjectIdNotFound,
-		},
-		{
-			name:       "Try to detach non-existing task from project",
-			task:       Task{Id: "nonexistent"},
-			project:    project,
-			wantErr:    true,
-			expectedErr: ErrTaskByIdNotFound,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := tt.task.DetachTaskFromProject(tt.project)
-
-			if tt.wantErr {
-				if err == nil || err != tt.expectedErr {
-					t.Errorf("%s: expected error %v, got %v", tt.name, tt.expectedErr, err)
-				}
-			} else {
-				if err != nil {
-					t.Errorf("%s: unexpected error: %v", tt.name, err)
-				}
-
-				// For successful detachment, verify the task is no longer part of the project's tasks
-				if !tt.wantErr {
-					tasks, _ := ProjectTasks.Get(tt.project.Id)
-					for _, task := range tasks.([]Task) {
-						if task.Id == tt.task.Id {
-							t.Errorf("%s: task was not detached from the project", tt.name)
-							break
-						}
-					}
-				}
-			}
-		})
-	}
-}
-
+/*
 func Test_GetAllTasks(t *testing.T) {
     
     // mocking the tasks based on previous tests
@@ -253,7 +124,26 @@ func Test_GetAllTasks(t *testing.T) {
     if string(expected) != actual {
         t.Errorf("Expected and actual task JSON strings do not match.\nExpected: %s\nActual: %s", string(expected), actual)
     }
+}*/
+
+func Test_GetProjectById(t *testing.T){
+    // test getting a non-existing project
+    nonProject, err := GetProjectById("0")
+    if err != ErrProjectByIdNotFound {
+        t.Fatalf("Expected ErrProjectByIdNotFound, got: %v", err)
+    }
+
+    // test getting the correct task by id
+    correctProject, err := GetProjectById("1")
+    if err != nil {
+        t.Fatalf("Failed to get project by id, error: %v", err)
+    }
+
+    if correctProject.Body != "First project" {
+        t.Fatalf("Got the wrong project, with body: %v", correctProject.Body)
+    }
 }
+/*
 
 func Test_GetTasksByRealm(t *testing.T) {
     

@@ -123,7 +123,7 @@ func (p Project) GetProjectTasks() (tasks []Task, err error) {
 	if ProjectTasks.Size() != 0 {
 		existingProjectTasks, exist := ProjectTasks.Get(p.Id)
 		if !exist {
-			// if there's no record in ProjectTasks, we don't have to remove anything
+			// if there's no record in ProjectTasks, we don't have to return anything
 			return nil, ErrProjectTasksNotFound
 		} else {
 			return existingProjectTasks.([]Task), nil
@@ -145,18 +145,103 @@ func GetProjectById(projectId string) (p Project, err error) {
 	}
 }
 
+func GetAllProjects() (projects string, err error) {
+	// implementation
+	var allProjects []Project
+	
+	// Iterate over the Projects AVL tree to collect all Project objects.
+	
+	Projects.Iterate("", "", func(key string, value interface{}) bool {
+		if project, ok := value.(Project); ok {
+			// get project tasks, if any
+			projectTasks, err := project.GetProjectTasks()
+			if projectTasks != nil {
+				project.Tasks = projectTasks
+			}
+			allProjects = append(allProjects, project)
+		}
+		return false // Continue iteration until all nodes have been visited.
+	})
+
+	// Create a ProjectsObject with all collected tasks.
+	projectsObject := ProjectsObject{
+		Projects: allProjects,
+	}
+
+	// Use the custom MarshalJSON method to marshal the tasks into JSON.
+	marshalledProjects, merr := projectsObject.MarshalJSON()
+	if merr != nil {
+		return "", merr
+	} 
+	return string(projectsObject), nil
+}
+
 func GetProjectsByRealm(realmId string) (projects string, err error) {
 	// implementation
+	var realmProjects []Project
+	
+	// Iterate over the Projects AVL tree to collect all Project objects.
+	
+	Projects.Iterate("", "", func(key string, value interface{}) bool {
+		if project, ok := value.(Project); ok {
+			if project.RealmId == realmId {
+				// get project tasks, if any
+				projectTasks, err := project.GetProjectTasks()
+				if projectTasks != nil {
+					project.Tasks = projectTasks
+				}
+				realmProjects = append(realmProjects, project)
+			}
+		}
+		return false // Continue iteration until all nodes have been visited.
+	})
+
+	// Create a ProjectsObject with all collected tasks.
+	projectsObject := ProjectsObject{
+		Projects: realmProjects,
+	}
+
+	// Use the custom MarshalJSON method to marshal the tasks into JSON.
+	marshalledProjects, merr := projectsObject.MarshalJSON()
+	if merr != nil {
+		return "", merr
+	} 
+	return string(projectsObject), nil
 }
 
 func GetProjectsByContext(contextId string) (projects string, err error) {
 	// implementation
+	var contextProjects []Project
+	
+	// Iterate over the Projects AVL tree to collect all Project objects.
+	
+	Projects.Iterate("", "", func(key string, value interface{}) bool {
+		if project, ok := value.(Project); ok {
+			if project.ContextId == contextId {
+				// get project tasks, if any
+				projectTasks, err := project.GetProjectTasks()
+				if projectTasks != nil {
+					project.Tasks = projectTasks
+				}
+				contextProjects = append(contextProjects, project)
+			}
+		}
+		return false // Continue iteration until all nodes have been visited.
+	})
+
+	// Create a ProjectsObject with all collected tasks.
+	projectsObject := ProjectsObject{
+		Projects: contextProjects,
+	}
+
+	// Use the custom MarshalJSON method to marshal the tasks into JSON.
+	marshalledProjects, merr := projectsObject.MarshalJSON()
+	if merr != nil {
+		return "", merr
+	} 
+	return string(projectsObject), nil
 }
 
 func GetProjectsByDate(date string) (projects string, err error) {
-	// implementation
-}
-
-func GetAllProjects() (projects string, err error) {
 	// implementation
 }
