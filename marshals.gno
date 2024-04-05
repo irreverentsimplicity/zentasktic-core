@@ -227,3 +227,21 @@ func (c Collection) MarshalJSON() ([]byte, error) {
 
 	return b.Bytes(), nil
 }
+
+func (co CollectionsObject) MarshalJSON() ([]byte, error) {
+	var b bytes.Buffer
+
+	b.WriteString(`{"collections":[`)
+	for i, collection := range co.Collections {
+		if i > 0 {
+			b.WriteString(`,`)
+		}
+		collectionJSON, perr := collection.MarshalJSON()
+		if perr == nil {
+			b.WriteString(string(collectionJSON))
+		}
+	}
+	b.WriteString(`]}`)
+
+	return b.Bytes(), nil
+}
