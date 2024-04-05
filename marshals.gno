@@ -195,6 +195,10 @@ func (c Collection) MarshalJSON() ([]byte, error) {
 	b.WriteString(c.Id)
 	b.WriteString(`",`)
 
+	b.WriteString(`"collectionRealmId":"`)
+	b.WriteString(c.RealmId)
+	b.WriteString(`",`)
+
 	b.WriteString(`"collectionName":"`)
 	b.WriteString(c.Name)
 	b.WriteString(`",`)

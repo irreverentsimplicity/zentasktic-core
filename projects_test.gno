@@ -16,7 +16,7 @@ func Test_AddProject(t *testing.T) {
         t.Errorf("Failed to add project: %v", err)
     }
 
-    // Test adding a duplicate task.
+    // Test adding a duplicate project.
     cerr := project.AddProject()
     if cerr != ErrProjectIdAlreadyExists {
         t.Errorf("Expected ErrProjectIdAlreadyExists, got %v", cerr)
