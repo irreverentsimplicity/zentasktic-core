@@ -70,86 +70,129 @@ func Test_EditCollection(t *testing.T) {
     }
 }
 
-/*
-func Test_GetAllProjects(t *testing.T) {
-    
-    // mocking the tasks based on previous tests
-    // TODO: add isolation?
-    knownProjects := []Project{
-        {Id: "1", Body: "First project", RealmId: "1", ContextId: "1",},
-		{Id: "2", Body: "Edited project content", RealmId: "1", ContextId: "2",},
-        {Id: "20", Body: "Removable project", RealmId: "1", ContextId: "2",},
-		{Id: "3", Body: "Project id 3 content", RealmId: "2", ContextId: "1",},
+func Test_AddProjectToCollection(t *testing.T){
+    // Example Collection and Projects
+    col := Collection{Id: "1", Name: "Collection 1", RealmId: "4",}
+    prj := Project{Id: "10", Body: "Project 10", RealmId: "1",}
+
+    Collections.Set(col.Id, col) // Mock existing collections
+
+    tests := []struct {
+        name    string
+        collection Collection
+        project    Project
+        wantErr bool
+        errMsg  error
+    }{
+        {
+            name:    "Attach to existing collection",
+            collection: col,
+            project:    prj,
+            wantErr: false,
+        },
+        {
+            name:    "Attach to non-existing collection",
+            collection: Collection{Id: "200", Name: "Collection 200", RealmId: "4",},
+            project:    prj,
+            wantErr: true,
+            errMsg:  ErrCollectionIdNotFound,
+        },
     }
 
-    // Manually marshal the known projects to create the expected outcome.
-    projectsObject := ProjectsObject{Projects: knownProjects}
-    expected, err := projectsObject.MarshalJSON()
-    if err != nil {
-        t.Fatalf("Failed to manually marshal known projects: %v", err)
-    }
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            err := tt.collection.AddProjectToCollection(tt.project)
+            if (err != nil) != tt.wantErr {
+                t.Errorf("AddProjectToCollection() error = %v, wantErr %v", err, tt.wantErr)
+            }
+            if tt.wantErr && err != tt.errMsg {
+                t.Errorf("AddProjectToCollection() error = %v, expected %v", err, tt.errMsg)
+            }
 
-    // Execute GetAllProjects() to get the actual outcome.
-    actual, err := GetAllProjects()
-    if err != nil {
-        t.Fatalf("GetAllProjects() failed with error: %v", err)
-    }
-
-    // Compare the expected and actual outcomes.
-    if string(expected) != actual {
-        t.Errorf("Expected and actual project JSON strings do not match.\nExpected: %s\nActual: %s", string(expected), actual)
-    }
-}
-
-func Test_GetProjectTasks(t *testing.T){
-    
-    task := Task{Id: "1", RealmId: "1", Body: "First task", ContextId: "1",}
-
-    project, perr := GetProjectById("1")
-    if perr != nil {
-        t.Errorf("GetProjectById() failed, %v", perr)
-    }
-
-    // test attaching to an existing project
-    atterr := task.AttachTaskToProject(project)
-    if atterr != nil {
-        t.Errorf("AttachTaskToProject() failed, %v", atterr)
-    }
-
-    projectTasks, pterr := project.GetProjectTasks()
-    if len(projectTasks) == 0 {
-        t.Errorf("GetProjectTasks() failed, %v", pterr)
-    }
-
-    // test detaching from an existing project
-    dtterr := task.DetachTaskFromProject(project)
-    if dtterr != nil {
-        t.Errorf("DetachTaskFromProject() failed, %v", dtterr)
-    }
-
-    projectWithNoTasks, pterr := project.GetProjectTasks()
-    if len(projectWithNoTasks) != 0 {
-        t.Errorf("GetProjectTasks() after detach failed, %v", pterr)
+            // For successful attach, verify the project is added to the collection's tasks.
+            if !tt.wantErr {
+                projects, exist := CollectionProjects.Get(tt.collection.Id)
+                if !exist || len(projects.([]Project)) == 0 {
+                    t.Errorf("Project was not added to the collection")
+                } else {
+                    found := false
+                    for _, project := range projects.([]Project) {
+                        if project.Id == tt.project.Id {
+                            found = true
+                            break
+                        }
+                    }
+                    if !found {
+                        t.Errorf("Project was not attached to the collection")
+                    }
+                }
+            }
+        })
     }
 }
 
-func Test_GetProjectById(t *testing.T){
-    // test getting a non-existing project
-    nonProject, err := GetProjectById("0")
-    if err != ErrProjectByIdNotFound {
-        t.Fatalf("Expected ErrProjectByIdNotFound, got: %v", err)
+func Test_AddTaskToCollection(t *testing.T){
+    // Example Collection and Projects
+    col := Collection{Id: "2", Name: "Collection 2", RealmId: "4",}
+    tsk := Task{Id: "10", Body: "Task 10", RealmId: "1",}
+
+    Collections.Set(col.Id, col) // Mock existing collections
+
+    tests := []struct {
+        name    string
+        collection Collection
+        task    Task
+        wantErr bool
+        errMsg  error
+    }{
+        {
+            name:    "Attach to existing collection",
+            collection: col,
+            task:    tsk,
+            wantErr: false,
+        },
+        {
+            name:    "Attach to non-existing collection",
+            collection: Collection{Id: "210", Name: "Collection 210", RealmId: "4",},
+            task:    tsk,
+            wantErr: true,
+            errMsg:  ErrCollectionIdNotFound,
+        },
     }
 
-    // test getting the correct task by id
-    correctProject, err := GetProjectById("1")
-    if err != nil {
-        t.Fatalf("Failed to get project by id, error: %v", err)
-    }
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            err := tt.collection.AddTaskToCollection(tt.task)
+            if (err != nil) != tt.wantErr {
+                t.Errorf("AddTaskToCollection() error = %v, wantErr %v", err, tt.wantErr)
+            }
+            if tt.wantErr && err != tt.errMsg {
+                t.Errorf("AddTaskToCollection() error = %v, expected %v", err, tt.errMsg)
+            }
 
-    if correctProject.Body != "First project" {
-        t.Fatalf("Got the wrong project, with body: %v", correctProject.Body)
+            // For successful attach, verify the task is added to the collection's tasks.
+            if !tt.wantErr {
+                tasks, exist := CollectionTasks.Get(tt.collection.Id)
+                if !exist || len(tasks.([]Task)) == 0 {
+                    t.Errorf("Task was not added to the collection")
+                } else {
+                    found := false
+                    for _, task := range tasks.([]Task) {
+                        if task.Id == tt.task.Id {
+                            found = true
+                            break
+                        }
+                    }
+                    if !found {
+                        t.Errorf("Task was not attached to the collection")
+                    }
+                }
+            }
+        })
     }
-}*/
+}
+
+
 
 
 
