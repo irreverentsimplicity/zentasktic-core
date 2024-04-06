@@ -67,7 +67,6 @@ func (c Collection) RemoveCollection() (err error) {
 	return nil
 }
 
-
 func (c Collection) AddProjectToCollection(p Project) (err error) {
 	// implementation
 	if Collections.Size() != 0 {
@@ -88,9 +87,9 @@ func (c Collection) AddProjectToCollection(p Project) (err error) {
 		}
 		existingCollectionProjects = projects
 	}
-	updatedProjects := append(existingCollectionProjects.([]Project), p)
 	p.RealmId = "4"
 	p.EditProject()
+	updatedProjects := append(existingCollectionProjects.([]Project), p)
 	CollectionProjects.Set(c.Id, updatedProjects)
 
 	return nil
@@ -116,9 +115,9 @@ func (c Collection) AddTaskToCollection(t Task) (err error) {
 		}
 		existingCollectionTasks = tasks
 	}
-	updatedTasks := append(existingCollectionTasks.([]Task), t)
 	t.RealmId = "4"
 	t.EditTask()
+	updatedTasks := append(existingCollectionTasks.([]Task), t)
 	CollectionTasks.Set(c.Id, updatedTasks)
 
 	return nil
@@ -150,7 +149,7 @@ func (c Collection) RemoveProjectFromCollection(p Project) (err error) {
 
 	// If the project was found, we remove it from the slice.
 	if index != -1 {
-		// by default we send it bacl to Assess
+		// by default we send it back to Assess
 		p.RealmId = "1"
 		p.EditProject()
 		existingCollectionProjects = append(existingCollectionProjects.([]Project)[:index], existingCollectionProjects.([]Project)[index+1:]...)
@@ -204,10 +203,6 @@ func (c Collection) RemoveTaskFromCollection(t Task) (err error) {
 
 // getters
 
-func GetAllCollections() (collections string, err error) {
-	// implementation
-} 
-
 func GetCollectionById(collectionId string) (c Collection, err error) {
 	// implementation
 	if Collections.Size() != 0 {
@@ -228,3 +223,48 @@ func GetCollectionById(collectionId string) (c Collection, err error) {
 		}
 	}
 }
+
+
+func (c Collection) GetCollectionTasks() (tasks []Task, err error) {
+	// implementation, query CollectionTasks and return the []Tasks object
+	existingCollectionTasks := []Task
+
+	if CollectionTasks.Size() != 0 {
+		existingCollectionTasks, exist := CollectionTasks.Get(c.Id)
+		if !exist {
+			// if there's no record in CollectionTasks, we don't have to return anything
+			return nil, ErrCollectionsTasksNotFound
+		} else {
+			return existingCollectionTasks.([]Task), nil
+		}
+	}
+	return nil, nil
+}
+
+func (c Collection) GetCollectionProjects() (projects []Project, err error) {
+	// implementation, query CollectionProjects and return the []Projects object
+	existingCollectionProjects := []Project
+
+	if CollectionProjects.Size() != 0 {
+		existingCollectionProjects, exist := CollectionProjects.Get(c.Id)
+		if !exist {
+			// if there's no record in CollectionProjects, we don't have to return anything
+			return nil, ErrCollectionsProjectsNotFound
+		} else {
+			return existingCollectionProjects.([]Project), nil
+		}
+	}
+	return nil, nil
+}
+
+func (c Collection) GetTaskFromCollectionById(taskId string) (t Task, err error) {
+
+}
+
+func (c Collection) GetProjectFromCollectionById(projectId string) (p Project, err error) {
+
+}
+
+func GetAllCollections() (collections string, err error) {
+	// implementation
+} 

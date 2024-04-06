@@ -103,6 +103,8 @@ func Test_GetAllProjects(t *testing.T) {
         {Id: "1", Body: "First project", RealmId: "1", ContextId: "1",},
 		{Id: "2", Body: "Edited project content", RealmId: "1", ContextId: "2",},
         {Id: "20", Body: "Removable project", RealmId: "1", ContextId: "2",},
+        {Id: "21", Body: "Project 21", RealmId: "1",},
+        {Id: "22", Body: "Project 22", RealmId: "1",},
 		{Id: "3", Body: "Project id 3 content", RealmId: "2", ContextId: "1",},
     }
 
@@ -183,6 +185,8 @@ func Test_GetProjectsByRealm(t *testing.T) {
         {Id: "1", Body: "First project", RealmId: "1", ContextId: "1",},
 		{Id: "2", Body: "Edited project content", RealmId: "1", ContextId: "2",},
         {Id: "20", Body: "Removable project", RealmId: "1", ContextId: "2",},
+        {Id: "21", Body: "Project 21", RealmId: "1",},
+        {Id: "22", Body: "Project 22", RealmId: "1",},
     }
 
     // Manually marshal the known projects to create the expected outcome.

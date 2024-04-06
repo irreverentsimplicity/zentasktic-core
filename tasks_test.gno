@@ -231,6 +231,7 @@ func Test_GetAllTasks(t *testing.T) {
         {Id: "2", Body: "Edited content", RealmId: "1", ContextId: "2",},
         {Id: "20", Body: "Removable task", RealmId: "1",},
         {Id: "3", Body: "First content", RealmId: "2", ContextId: "1",},
+        {Id: "40", Body: "Task 40", RealmId: "1",},
     }
 
     // Manually marshal the known tasks to create the expected outcome.
@@ -278,6 +279,7 @@ func Test_GetTasksByRealm(t *testing.T) {
         {Id: "1", RealmId: "1", Body: "First task", ContextId: "1",},
         {Id: "2", RealmId: "1", Body: "Edited content", ContextId: "2",},
         {Id: "20", Body: "Removable task", RealmId: "1",},
+        {Id: "40", Body: "Task 40", RealmId: "1",},
     }
 
     // Manually marshal the known tasks to create the expected outcome.

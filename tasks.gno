@@ -175,7 +175,6 @@ func GetTaskById(taskId string) (t Task, err error) {
 	}
 }
 
-
 func GetAllTasks() (tasks string, err error) {
 	// implementation
 	var allTasks []Task

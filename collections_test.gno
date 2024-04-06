@@ -23,7 +23,6 @@ func Test_AddCollection(t *testing.T) {
     }
 }
 
-
 func Test_RemoveCollection(t *testing.T) {
     
     collection := Collection{Id: "20", RealmId: "4", Name: "Removable collection",}
@@ -45,7 +44,6 @@ func Test_RemoveCollection(t *testing.T) {
         t.Errorf("Expected ErrCollectionNotRemoved, got %v", terr)
     }
 }
-
 
 func Test_EditCollection(t *testing.T) {
     
@@ -132,9 +130,9 @@ func Test_AddProjectToCollection(t *testing.T){
 }
 
 func Test_AddTaskToCollection(t *testing.T){
-    // Example Collection and Projects
+    // Example Collection and Tasks
     col := Collection{Id: "2", Name: "Collection 2", RealmId: "4",}
-    tsk := Task{Id: "10", Body: "Task 10", RealmId: "1",}
+    tsk := Task{Id: "30", Body: "Task 30", RealmId: "1",}
 
     Collections.Set(col.Id, col) // Mock existing collections
 
@@ -190,6 +188,144 @@ func Test_AddTaskToCollection(t *testing.T){
             }
         })
     }
+}
+
+func Test_RemoveProjectFromCollection(t *testing.T){
+    // Setup:
+	collection := Collection{Id: "300", Name: "Collection 300",}
+	project1 := Project{Id: "21", Body: "Project 21", RealmId: "1",}
+	project2 := Project{Id: "22", Body: "Project 22", RealmId: "1",}
+
+    collection.AddCollection()
+    project1.AddProject()
+    project2.AddProject()
+    collection.AddProjectToCollection(project1)
+    collection.AddProjectToCollection(project2)
+
+	tests := []struct {
+		name       string
+		project    Project
+		collection    Collection
+		wantErr    bool
+		expectedErr error
+	}{
+		{
+			name:       "Remove existing project from collection",
+			project:       project1,
+			collection:    collection,
+			wantErr:    false,
+			expectedErr: nil,
+		},
+		{
+			name:       "Try to remove project from non-existing collection",
+			project:       project1,
+			collection:    Collection{Id: "nonexistent"},
+			wantErr:    true,
+			expectedErr: ErrCollectionIdNotFound,
+		},
+		{
+			name:       "Try to remove non-existing project from collection",
+			project:       Project{Id: "nonexistent"},
+			collection:    collection,
+			wantErr:    true,
+			expectedErr: ErrProjectByIdNotFound,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.collection.RemoveProjectFromCollection(tt.project)
+
+			if tt.wantErr {
+				if err == nil || err != tt.expectedErr {
+					t.Errorf("%s: expected error %v, got %v", tt.name, tt.expectedErr, err)
+				}
+			} else {
+				if err != nil {
+					t.Errorf("%s: unexpected error: %v", tt.name, err)
+				}
+
+				// For successful removal, verify the project is no longer part of the collection's projects
+				if !tt.wantErr {
+					projects, _ := CollectionProjects.Get(tt.collection.Id)
+					for _, project := range projects.([]Project) {
+						if project.Id == tt.project.Id {
+							t.Errorf("%s: project was not detached from the collection", tt.name)
+							break
+						}
+					}
+				}
+			}
+		})
+	}
+}
+
+
+func Test_RemoveTaskFromCollection(t *testing.T){
+    // setup, re-using parts from Test_AddTaskToCollection
+	collection := Collection{Id: "40", Name: "Collection 40",}
+    task1 := Task{Id: "40", Body: "Task 40", RealmId: "1",}
+
+    collection.AddCollection()
+    task1.AddTask()
+    collection.AddTaskToCollection(task1)
+
+	tests := []struct {
+		name       string
+		task    Task
+		collection    Collection
+		wantErr    bool
+		expectedErr error
+	}{
+		{
+			name:       "Remove existing task from collection",
+			task:       task1,
+			collection:    collection,
+			wantErr:    false,
+			expectedErr: nil,
+		},
+		{
+			name:       "Try to remove task from non-existing collection",
+			task:       task1,
+			collection:    Collection{Id: "nonexistent"},
+			wantErr:    true,
+			expectedErr: ErrCollectionIdNotFound,
+		},
+		{
+			name:       "Try to remove non-existing task from collection",
+			task:       Task{Id: "nonexistent"},
+			collection:    collection,
+			wantErr:    true,
+			expectedErr: ErrTaskByIdNotFound,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.collection.RemoveTaskFromCollection(tt.task)
+
+			if tt.wantErr {
+				if err == nil || err != tt.expectedErr {
+					t.Errorf("%s: expected error %v, got %v", tt.name, tt.expectedErr, err)
+				}
+			} else {
+				if err != nil {
+					t.Errorf("%s: unexpected error: %v", tt.name, err)
+				}
+
+				// For successful removal, verify the task is no longer part of the collection's tasks
+				if !tt.wantErr {
+					tasks, _ := CollectionTasks.Get(tt.collection.Id)
+					for _, task := range tasks.([]Task) {
+						if task.Id == tt.task.Id {
+							t.Errorf("%s: task was not detached from the collection", tt.name)
+							break
+						}
+					}
+				}
+			}
+		})
+	}
 }
 
 
