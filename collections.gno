@@ -257,14 +257,38 @@ func (c Collection) GetCollectionProjects() (projects []Project, err error) {
 	return nil, nil
 }
 
-func (c Collection) GetTaskFromCollectionById(taskId string) (t Task, err error) {
-
-}
-
-func (c Collection) GetProjectFromCollectionById(projectId string) (p Project, err error) {
-
-}
-
 func GetAllCollections() (collections string, err error) {
 	// implementation
+	var allCollections []Collection
+	
+	// Iterate over the Collections AVL tree to collect all Project objects.
+	
+	Collections.Iterate("", "", func(key string, value interface{}) bool {
+		if collection, ok := value.(Collection); ok {
+			// get collection tasks, if any
+			collectionTasks, err := collection.GetCollectionTasks()
+			if collectionTasks != nil {
+				collection.Tasks = collectionTasks
+			}
+			// get collection prokects, if any
+			collectionProjects, err := collection.GetCollectionProjects()
+			if collectionProjects != nil {
+				collection.Projects = collectionProjects
+			}
+			allCollections = append(allCollections, collection)
+		}
+		return false // Continue iteration until all nodes have been visited.
+	})
+
+	// Create a CollectionsObject with all collected tasks.
+	collectionsObject := CollectionsObject{
+		Collections: allCollections,
+	}
+
+	// Use the custom MarshalJSON method to marshal the collections into JSON.
+	marshalledCollections, merr := collectionsObject.MarshalJSON()
+	if merr != nil {
+		return "", merr
+	} 
+	return string(marshalledCollections), nil
 } 
