@@ -29,4 +29,6 @@ var (
 	ErrProjectNotRemoved			= errors.New("Project was not removed")
 	ErrCollectionNotRemoved			= errors.New("Collection was not removed")
 	ErrObjectPathNotUpdated			= errors.New("Object path wasn't updated")
+	ErrInvalidateDateFormat			= errors.New("Invalida date format")
+	ErrInvalidDateFilterType		= errors.New("Invalid date filter type")
 )

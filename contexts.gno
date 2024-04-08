@@ -4,6 +4,7 @@ package zentasktic
 import (
 	"strconv"
 	"errors"
+	"time"
 
 	"gno.land/p/demo/avl"
 )
@@ -88,36 +89,30 @@ func (c Context) AddContextToTask(t Task) (err error) {
 	return nil
 }
 
-/*
-func () AddContextToProject(string contextId, string projectId) (err error) {
+
+func (c Context) AddContextToProject(p Project) (err error) {
 	// check if project exists
-	project, perr := projects.Get(projectId)
-	if perr != nil {
-		return perr
+	project, exist := Projects.Get(p.Id)
+	if !exist {
+		return ErrProjectIdNotFound
 	}
 	// check if context exists
-	context, cerr := contexts.Get(contextId)
-	if cerr != nil {
-		return cerr
+	context, cexist := Contexts.Get(c.Id)
+	if !cexist {
+		return ErrContextIdNotFound
 	}
 
-	editedProject := &Project {
-		Id: project.ProjectId
-		ContextId: contextId	
-		RealmId: project.RealmId
-		Body: project.Body
-		Due: project.Due
-	}
-	// check to see if task is editable -> RealmId = 1 (Assess)
-	if editedProject.RealmId == 1 {
-		Projects.Set(taskId, editedProject)
-	}
-	else {
+	// check to see if project is in RealmId = 2 (Decide)
+	// we can only add resources in Decide
+	if p.RealmId == "2" {
+		project.(Project).ContextId = c.Id
+		Projects.Set(p.Id, project.(Project))
+	} else {
 		return ErrProjectNotEditable
 	}
-	
+
 	return nil
-}*/
+}
 
 
 // getters

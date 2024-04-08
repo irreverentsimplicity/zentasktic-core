@@ -4,6 +4,7 @@ package zentasktic
 import (
 	"strconv"
 	"errors"
+	"time"
 
 	"gno.land/p/demo/avl"
 )
@@ -130,6 +131,27 @@ func (p Project) GetProjectTasks() (tasks []Task, err error) {
 	return nil, nil
 }
 
+func (p Project) SetProjectDueDate(dueDate string) (err error) {
+
+	// implementation
+	// check if project exists
+	project, exist := Projects.Get(p.Id)
+	if !exist {
+		return ErrProjectIdNotFound
+	}
+
+	// check to see if project is in RealmId = 2 (Decide)
+	// we can only add resources in Decide
+	if p.RealmId == "2" {
+		project.(Project).Due = dueDate
+		Projects.Set(p.Id, project.(Project))
+	} else {
+		return ErrProjectNotEditable
+	}
+
+	return nil
+}
+
 // getters
 
 func GetProjectById(projectId string) (p Project, err error) {
@@ -240,6 +262,74 @@ func GetProjectsByContext(contextId string) (projects string, err error) {
 	return string(marshalledProjects), nil
 }
 
-func GetProjectsByDate(date string) (projects string, err error) {
+func GetProjectsByDate(projectDate string, filterType string) (projects string, err error) {
 	// implementation
+	parsedDate, err:= time.Parse("2006-01-02", projectDate)
+	if err != nil {
+		return "", ErrInvalidateDateFormat
+	}
+
+	var filteredProjects []Project
+	
+	Projects.Iterate("", "", func(key string, value interface{}) bool {
+		project, ok := value.(Project)
+		if !ok {
+			return true // Skip this iteration and continue.
+		}
+
+		storedDate, serr := time.Parse("2006-01-02", project.Due)
+		if serr != nil {
+			// Skip projects with invalid dates.
+			return true
+		}
+
+		switch filterType {
+		case "specific":
+			if storedDate.Format("2006-01-02") == parsedDate.Format("2006-01-02") {
+				// get project tasks, if any
+				projectTasks, err := project.GetProjectTasks()
+				if projectTasks != nil {
+					project.Tasks = projectTasks
+				}
+				filteredProjects = append(filteredProjects, project)
+			}
+		case "before":
+			if storedDate.Before(parsedDate) {
+				// get project tasks, if any
+				projectTasks, err := project.GetProjectTasks()
+				if projectTasks != nil {
+					project.Tasks = projectTasks
+				}
+				filteredProjects = append(filteredProjects, project)
+			}
+		case "after":
+			if storedDate.After(parsedDate) {
+				// get project tasks, if any
+				projectTasks, err := project.GetProjectTasks()
+				if projectTasks != nil {
+					project.Tasks = projectTasks
+				}
+				filteredProjects = append(filteredProjects, project)
+			}
+		}
+
+		return false // Continue iteration.
+	})
+
+	if len(filteredProjects) == 0 {
+		return "", nil
+	}
+
+	// Create a ProjectsObject with all collected tasks.
+	projectsObject := ProjectsObject{
+		Projects: filteredProjects,
+	}
+
+	// Use the custom MarshalJSON method to marshal the tasks into JSON.
+	marshalledProjects, merr := projectsObject.MarshalJSON()
+	if merr != nil {
+		return "", merr
+	} 
+	return string(marshalledProjects), nil
+
 }

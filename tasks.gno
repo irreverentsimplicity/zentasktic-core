@@ -3,6 +3,7 @@ package zentasktic
 import (
 	"strconv"
 	"errors"
+	"time"
 
 	"gno.land/p/demo/avl"
 )
@@ -162,6 +163,44 @@ func (t Task) DetachTaskFromProject(p Project) (err error) {
 	return nil
 }
 
+func (t Task) SeTaskDueDate(dueDate string) (err error) {
+	// implementation
+	// check if task exists
+	task, exist := Tasks.Get(t.Id)
+	if !exist {
+		return ErrTaskIdNotFound
+	}
+
+	// check to see if task is in RealmId = 2 (Decide)
+	// we can only add resources in Decide
+	if t.RealmId == "2" {
+		task.(Task).Due = dueDate
+		Tasks.Set(t.Id, task.(Task))
+	} else {
+		return ErrTaskNotEditable
+	}
+
+	return nil
+}
+
+func (t Task) SetTaskAlert(alertDate string) (err error) {
+	// check if task exists
+	task, exist := Tasks.Get(t.Id)
+	if !exist {
+		return ErrTaskIdNotFound
+	}
+
+	// check to see if task is in RealmId = 2 (Decide)
+	// we can only add resources in Decide
+	if t.RealmId == "2" {
+		task.(Task).Alert = alertDate
+		Tasks.Set(t.Id, task.(Task))
+	} else {
+		return ErrTaskNotEditable
+	}
+
+	return nil
+}
 // getters
 
 func GetTaskById(taskId string) (t Task, err error) {
@@ -256,6 +295,58 @@ func GetTasksByContext(contextId string) (tasks string, err error) {
 	return string(marshalledTasks), nil
 }
 
-func GetTasksByDate(taskDate string) (tasks string, err error) {
+func GetTasksByDate(taskDate string, filterType string) (tasks string, err error) {
 	// implementation
+	parsedDate, err:= time.Parse("2006-01-02", taskDate)
+	if err != nil {
+		return "", ErrInvalidateDateFormat
+	}
+
+	var filteredTasks []Task
+	
+	Tasks.Iterate("", "", func(key string, value interface{}) bool {
+		task, ok := value.(Task)
+		if !ok {
+			return true // Skip this iteration and continue.
+		}
+
+		storedDate, serr := time.Parse("2006-01-02", task.Due)
+		if serr != nil {
+			// Skip tasks with invalid dates.
+			return true
+		}
+
+		switch filterType {
+		case "specific":
+			if storedDate.Format("2006-01-02") == parsedDate.Format("2006-01-02") {
+				filteredTasks = append(filteredTasks, task)
+			}
+		case "before":
+			if storedDate.Before(parsedDate) {
+				filteredTasks = append(filteredTasks, task)
+			}
+		case "after":
+			if storedDate.After(parsedDate) {
+				filteredTasks = append(filteredTasks, task)
+			}
+		}
+
+		return false // Continue iteration.
+	})
+
+	if len(filteredTasks) == 0 {
+		return "", nil
+	}
+
+	// Create a TasksObject with all collected tasks.
+	tasksObject := TasksObject{
+		Tasks: filteredTasks,
+	}
+
+	// Use the custom MarshalJSON method to marshal the tasks into JSON.
+	marshalledTasks, merr := tasksObject.MarshalJSON()
+	if merr != nil {
+		return "", merr
+	} 
+	return string(marshalledTasks), nil
 }
