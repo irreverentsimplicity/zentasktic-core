@@ -182,6 +182,36 @@ func Test_GetAllProjects(t *testing.T) {
     }
 }
 
+func Test_GetProjectsByDate(t *testing.T) {
+	
+	tests := []struct {
+		name      string
+		projectDate  string
+		filterType string
+		want      string
+		wantErr   bool
+	}{
+		{"SpecificDate", "2024-01-01", "specific", `{"projects":[{"projectId":"10","projectContextId":"2","projectRealmId":"2","projectTasks":[],"projectBody":"Project 10","projectDue":"2024-01-01"}]}`, false},
+		{"BeforeDate", "2022-04-05", "before", "", false},
+		{"AfterDate", "2025-04-05", "after", "", false},
+		{"NoMatch", "2002-04-07", "specific", "", false},
+		{"InvalidDateFormat", "April 5, 2023", "specific", "", true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := GetProjectsByDate(tt.projectDate, tt.filterType)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetProjectsByDate() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if err == nil && got != tt.want {
+				t.Errorf("GetProjectsByDate() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func Test_GetProjectTasks(t *testing.T){
     
     task := Task{Id: "1", RealmId: "1", Body: "First task", ContextId: "1",}

@@ -274,13 +274,13 @@ func GetProjectsByDate(projectDate string, filterType string) (projects string, 
 	Projects.Iterate("", "", func(key string, value interface{}) bool {
 		project, ok := value.(Project)
 		if !ok {
-			return true // Skip this iteration and continue.
+			return false // Skip this iteration and continue.
 		}
 
 		storedDate, serr := time.Parse("2006-01-02", project.Due)
 		if serr != nil {
 			// Skip projects with invalid dates.
-			return true
+			return false
 		}
 
 		switch filterType {
