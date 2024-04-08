@@ -94,6 +94,60 @@ func Test_MoveProjectToRealm(t *testing.T) {
     }
 }
 
+func Test_SetProjectDueDate(t *testing.T) {
+	projectRealmIdOne, _ := GetProjectById("1")
+    projectRealmIdTwo, _ := GetProjectById("10") 
+	// Define test cases
+	tests := []struct {
+		name    string
+		project    Project
+		dueDate string
+		wantErr error
+	}{
+		{
+			name: "Project does not exist",
+			project: Project{Id: "nonexistent", RealmId: "2"},
+			wantErr: ErrProjectIdNotFound,
+		},
+		{
+			name: "Project not editable due to wrong realm",
+			project: projectRealmIdOne,
+			wantErr: ErrProjectNotEditable,
+		},
+		{
+			name: "Successfully set alert",
+			project: projectRealmIdTwo,
+			dueDate: "2024-01-01",
+			wantErr: nil,
+		},
+	}
+
+	// Execute test cases
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			err := tc.project.SetProjectDueDate(tc.dueDate)
+
+			// Validate
+			if err != tc.wantErr {
+				t.Errorf("Expected error %v, got %v", tc.wantErr, err)
+			}
+
+			// Additional check for the success case to ensure the due date was actually set
+			if err == nil {
+				// Fetch the task again to check if the due date was set correctly
+				updatedProject, exist := Projects.Get(tc.project.Id)
+				if !exist {
+					t.Fatalf("Project %v was not found after setting the due date", tc.project.Id)
+				}
+				if updatedProject.(Project).Due != tc.dueDate {
+					t.Errorf("Expected due date to be %v, got %v", tc.dueDate, updatedProject.(Project).Due)
+				}
+			}
+		})
+	}
+}
+
+// getters
 
 func Test_GetAllProjects(t *testing.T) {
     
@@ -101,7 +155,7 @@ func Test_GetAllProjects(t *testing.T) {
     // TODO: add isolation?
     knownProjects := []Project{
         {Id: "1", Body: "First project", RealmId: "1", ContextId: "1",},
-        {Id: "10", Body: "Project 10", RealmId: "2", ContextId: "2",},
+        {Id: "10", Body: "Project 10", RealmId: "2", ContextId: "2", Due: "2024-01-01"},
 		{Id: "2", Body: "Edited project content", RealmId: "1", ContextId: "2",},
         {Id: "20", Body: "Removable project", RealmId: "1", ContextId: "2",},
         {Id: "21", Body: "Project 21", RealmId: "1",},

@@ -221,13 +221,121 @@ func TestDetachTaskFromProject(t *testing.T) {
 	}
 }
 
+func Test_SetTaskDueDate(t *testing.T) {
+	taskRealmIdOne, _ := GetTaskById("1")
+    taskRealmIdTwo, _ := GetTaskById("10") 
+	// Define test cases
+	tests := []struct {
+		name    string
+		task    Task
+		dueDate string
+		wantErr error
+	}{
+		{
+			name: "Task does not exist",
+			task: Task{Id: "nonexistent", RealmId: "2"},
+			wantErr: ErrTaskIdNotFound,
+		},
+		{
+			name: "Task not editable due to wrong realm",
+			task: taskRealmIdOne,
+			wantErr: ErrTaskNotEditable,
+		},
+		{
+			name: "Successfully set due date",
+			task: taskRealmIdTwo,
+			dueDate: "2023-01-01",
+			wantErr: nil,
+		},
+	}
+
+	// Execute test cases
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			err := tc.task.SetTaskDueDate(tc.dueDate)
+
+			// Validate
+			if err != tc.wantErr {
+				t.Errorf("Expected error %v, got %v", tc.wantErr, err)
+			}
+
+			// Additional check for the success case to ensure the due date was actually set
+			if err == nil {
+				// Fetch the task again to check if the due date was set correctly
+				updatedTask, exist := Tasks.Get(tc.task.Id)
+				if !exist {
+					t.Fatalf("Task %v was not found after setting the due date", tc.task.Id)
+				}
+				if updatedTask.(Task).Due != tc.dueDate {
+					t.Errorf("Expected due date to be %v, got %v", tc.dueDate, updatedTask.(Task).Due)
+				}
+			}
+		})
+	}
+}
+
+func Test_SetTaskAlert(t *testing.T) {
+	taskRealmIdOne, _ := GetTaskById("1")
+    taskRealmIdTwo, _ := GetTaskById("10") 
+	// Define test cases
+	tests := []struct {
+		name    string
+		task    Task
+		alertDate string
+		wantErr error
+	}{
+		{
+			name: "Task does not exist",
+			task: Task{Id: "nonexistent", RealmId: "2"},
+			wantErr: ErrTaskIdNotFound,
+		},
+		{
+			name: "Task not editable due to wrong realm",
+			task: taskRealmIdOne,
+			wantErr: ErrTaskNotEditable,
+		},
+		{
+			name: "Successfully set alert",
+			task: taskRealmIdTwo,
+			alertDate: "2024-01-01",
+			wantErr: nil,
+		},
+	}
+
+	// Execute test cases
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			err := tc.task.SetTaskAlert(tc.alertDate)
+
+			// Validate
+			if err != tc.wantErr {
+				t.Errorf("Expected error %v, got %v", tc.wantErr, err)
+			}
+
+			// Additional check for the success case to ensure the due date was actually set
+			if err == nil {
+				// Fetch the task again to check if the due date was set correctly
+				updatedTask, exist := Tasks.Get(tc.task.Id)
+				if !exist {
+					t.Fatalf("Task %v was not found after setting the due date", tc.task.Id)
+				}
+				if updatedTask.(Task).Alert != tc.alertDate {
+					t.Errorf("Expected due date to be %v, got %v", tc.alertDate, updatedTask.(Task).Due)
+				}
+			}
+		})
+	}
+}
+
+// getters
+
 func Test_GetAllTasks(t *testing.T) {
     
     // mocking the tasks based on previous tests
     // TODO: add isolation?
     knownTasks := []Task{
         {Id: "1", RealmId: "1", Body: "First task", ContextId: "1",},
-        {Id: "10", Body: "First content", RealmId: "2", ContextId: "2",},
+        {Id: "10", Body: "First content", RealmId: "2", ContextId: "2", Due: "2023-01-01", Alert: "2024-01-01"},
         {Id: "2", Body: "Edited content", RealmId: "1", ContextId: "2",},
         {Id: "20", Body: "Removable task", RealmId: "1",},
         {Id: "3", Body: "First content", RealmId: "2", ContextId: "1",},

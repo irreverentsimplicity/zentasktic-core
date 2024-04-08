@@ -163,7 +163,7 @@ func (t Task) DetachTaskFromProject(p Project) (err error) {
 	return nil
 }
 
-func (t Task) SeTaskDueDate(dueDate string) (err error) {
+func (t Task) SetTaskDueDate(dueDate string) (err error) {
 	// implementation
 	// check if task exists
 	task, exist := Tasks.Get(t.Id)
