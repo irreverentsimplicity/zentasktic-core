@@ -59,7 +59,6 @@ func (t Task) RemoveTask() (err error) {
 	return nil
 }
 
-
 func (t Task) EditTask() (err error) {
 	// implementation, get task by Id and replace the object
 	existingTask := Task{}
@@ -94,7 +93,6 @@ func (t Task) MoveTaskToRealm(realmId string) (err error) {
 	}
 	return nil
 }
-
 
 func (t Task) AttachTaskToProject(p Project) (err error) {
 	// implementation
@@ -307,13 +305,13 @@ func GetTasksByDate(taskDate string, filterType string) (tasks string, err error
 	Tasks.Iterate("", "", func(key string, value interface{}) bool {
 		task, ok := value.(Task)
 		if !ok {
-			return true // Skip this iteration and continue.
+			return false // Skip this iteration and continue.
 		}
 
 		storedDate, serr := time.Parse("2006-01-02", task.Due)
 		if serr != nil {
 			// Skip tasks with invalid dates.
-			return true
+			return false
 		}
 
 		switch filterType {

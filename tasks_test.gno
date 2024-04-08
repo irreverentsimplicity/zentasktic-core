@@ -361,6 +361,36 @@ func Test_GetAllTasks(t *testing.T) {
     }
 }
 
+func Test_GetTasksByDate(t *testing.T) {
+	
+	tests := []struct {
+		name      string
+		taskDate  string
+		filterType string
+		want      string
+		wantErr   bool
+	}{
+		{"SpecificDate", "2023-01-01", "specific", `{"tasks":[{"taskId":"10","taskProjectId":"","taskContextId":"2","taskRealmId":"2","taskBody":"First content","taskDue":"2023-01-01","taskAlert":"2024-01-01"}]}`, false},
+		{"BeforeDate", "2022-04-05", "before", "", false},
+		{"AfterDate", "2023-04-05", "after", "", false},
+		{"NoMatch", "2002-04-07", "specific", "", false},
+		{"InvalidDateFormat", "April 5, 2023", "specific", "", true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := GetTasksByDate(tt.taskDate, tt.filterType)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetTasksByDate() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if err == nil && got != tt.want {
+				t.Errorf("GetTasksByDate() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func Test_GetTaskById(t *testing.T){
     // test getting a non-existing task
     nonTask, err := GetTaskById("0")
