@@ -345,6 +345,66 @@ func Test_GetCollectionById(t *testing.T){
     }
 }
 
+func Test_GetCollectionTasks(t *testing.T) {
+    // retrieving objects based on these mocks
+    //col := Collection{Id: "2", Name: "Second Collection", RealmId: "4",}
+    tsk := Task{Id: "30", Body: "Task 30", RealmId: "1",}
+
+    collection, cerr := GetCollectionById("2")
+    if cerr != nil {
+        t.Errorf("GetCollectionById() failed, %v", cerr)
+    }
+
+    collectionTasks, pterr := collection.GetCollectionTasks()
+    if len(collectionTasks) == 0 {
+        t.Errorf("GetCollectionTasks() failed, %v", pterr)
+    }
+
+    // test detaching from an existing collection
+    dtterr := collection.RemoveTaskFromCollection(tsk)
+    if dtterr != nil {
+        t.Errorf("RemoveTaskFromCollection() failed, %v", dtterr)
+    }
+
+    collectionWithNoTasks, pterr := collection.GetCollectionTasks()
+    if len(collectionWithNoTasks) != 0 {
+        t.Errorf("GetCollectionTasks() after detach failed, %v", pterr)
+    }
+
+    // add task back to collection, for tests mockup integrity
+    collection.AddTaskToCollection(tsk)
+}
+
+func Test_GetCollectionProjects(t *testing.T) {
+    // retrieving objects based on these mocks
+    //col := Collection{Id: "1", Name: "First Collection", RealmId: "4",}
+    prj := Project{Id: "10", Body: "Project 10", RealmId: "2", ContextId: "2", Due: "2024-01-01"}
+
+    collection, cerr := GetCollectionById("1")
+    if cerr != nil {
+        t.Errorf("GetCollectionById() failed, %v", cerr)
+    }
+
+    collectionProjects, pterr := collection.GetCollectionProjects()
+    if len(collectionProjects) == 0 {
+        t.Errorf("GetCollectionProjects() failed, %v", pterr)
+    }
+
+    // test detaching from an existing collection
+    dtterr := collection.RemoveProjectFromCollection(prj)
+    if dtterr != nil {
+        t.Errorf("RemoveProjectFromCollection() failed, %v", dtterr)
+    }
+
+    collectionWithNoProjects, pterr := collection.GetCollectionProjects()
+    if len(collectionWithNoProjects) != 0 {
+        t.Errorf("GetCollectionProjects() after detach failed, %v", pterr)
+    }
+
+    // add project back to collection, for tests mockup integrity
+    collection.AddProjectToCollection(prj)
+}
+
 func Test_GetAllCollections(t *testing.T){
     // mocking the collections based on previous tests
     // TODO: add isolation?
@@ -357,11 +417,11 @@ func Test_GetAllCollections(t *testing.T){
             Projects: []Project{
                 {
                     Id:       "10",
-                    ContextId: "",
+                    ContextId: "2",
                     RealmId:   "4",
                     Tasks:     nil, 
                     Body:      "Project 10",
-                    Due:       "",
+                    Due:       "2024-01-01",
                 },
             },
         },
