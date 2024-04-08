@@ -101,6 +101,7 @@ func Test_GetAllProjects(t *testing.T) {
     // TODO: add isolation?
     knownProjects := []Project{
         {Id: "1", Body: "First project", RealmId: "1", ContextId: "1",},
+        {Id: "10", Body: "Project 10", RealmId: "2", ContextId: "2",},
 		{Id: "2", Body: "Edited project content", RealmId: "1", ContextId: "2",},
         {Id: "20", Body: "Removable project", RealmId: "1", ContextId: "2",},
         {Id: "21", Body: "Project 21", RealmId: "1",},

@@ -224,7 +224,6 @@ func GetCollectionById(collectionId string) (c Collection, err error) {
 	}
 }
 
-
 func (c Collection) GetCollectionTasks() (tasks []Task, err error) {
 	// implementation, query CollectionTasks and return the []Tasks object
 	existingCollectionTasks := []Task

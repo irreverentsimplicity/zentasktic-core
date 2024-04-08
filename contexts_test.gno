@@ -69,7 +69,7 @@ func Test_RemoveContext(t *testing.T) {
 
 func Test_AddContextToTask(t *testing.T) {
 
-    task := &Task{Id: "10", Body: "First content", RealmId: "2", ContextId: "1",}
+    task := Task{Id: "10", Body: "First content", RealmId: "2", ContextId: "1",}
 
     // Test adding a task successfully.
     err := task.AddTask()
@@ -78,7 +78,7 @@ func Test_AddContextToTask(t *testing.T) {
     }
     taskInDecide, exist := Tasks.Get("10")
 	if !exist {
-		t.Errorf("Task with id 1 not found")
+		t.Errorf("Task with id 10 not found")
 	}
 	// check if context exists
 	contextToAdd, cexist := Contexts.Get("2")
@@ -89,6 +89,31 @@ func Test_AddContextToTask(t *testing.T) {
     derr := contextToAdd.(Context).AddContextToTask(taskInDecide.(Task))
     if derr != nil {
         t.Errorf("Could not add context to a task in Decide, err %v", derr)
+    }
+}
+
+func Test_AddContextToProject(t *testing.T) {
+
+    project := Project{Id: "10", Body: "Project 10", RealmId: "2", ContextId: "1",}
+
+    // Test adding a project successfully.
+    err := project.AddProject()
+    if err != nil {
+        t.Errorf("Failed to add project: %v", err)
+    }
+    projectInDecide, exist := Projects.Get("10")
+	if !exist {
+		t.Errorf("Project with id 10 not found")
+	}
+	// check if context exists
+	contextToAdd, cexist := Contexts.Get("2")
+	if !cexist {
+		t.Errorf("Context with id 2 not found")
+	}
+
+    derr := contextToAdd.(Context).AddContextToProject(projectInDecide.(Project))
+    if derr != nil {
+        t.Errorf("Could not add context to a project in Decide, err %v", derr)
     }
 }
 

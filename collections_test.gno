@@ -70,7 +70,7 @@ func Test_EditCollection(t *testing.T) {
 
 func Test_AddProjectToCollection(t *testing.T){
     // Example Collection and Projects
-    col := Collection{Id: "1", Name: "Collection 1", RealmId: "4",}
+    col := Collection{Id: "1", Name: "First collection", RealmId: "4",}
     prj := Project{Id: "10", Body: "Project 10", RealmId: "1",}
 
     Collections.Set(col.Id, col) // Mock existing collections
@@ -131,7 +131,7 @@ func Test_AddProjectToCollection(t *testing.T){
 
 func Test_AddTaskToCollection(t *testing.T){
     // Example Collection and Tasks
-    col := Collection{Id: "2", Name: "Collection 2", RealmId: "4",}
+    col := Collection{Id: "2", Name: "Second Collection", RealmId: "4",}
     tsk := Task{Id: "30", Body: "Task 30", RealmId: "1",}
 
     Collections.Set(col.Id, col) // Mock existing collections
@@ -260,7 +260,6 @@ func Test_RemoveProjectFromCollection(t *testing.T){
 	}
 }
 
-
 func Test_RemoveTaskFromCollection(t *testing.T){
     // setup, re-using parts from Test_AddTaskToCollection
 	collection := Collection{Id: "40", Name: "Collection 40",}
@@ -326,6 +325,111 @@ func Test_RemoveTaskFromCollection(t *testing.T){
 			}
 		})
 	}
+}
+
+func Test_GetCollectionById(t *testing.T){
+    // test getting a non-existing collection
+    nonCollection, err := GetCollectionById("0")
+    if err != ErrCollectionByIdNotFound {
+        t.Fatalf("Expected ErrCollectionByIdNotFound, got: %v", err)
+    }
+
+    // test getting the correct collection by id
+    correctCollection, err := GetCollectionById("1")
+    if err != nil {
+        t.Fatalf("Failed to get collection by id, error: %v", err)
+    }
+
+    if correctCollection.Name != "First collection" {
+        t.Fatalf("Got the wrong collection, with name: %v", correctCollection.Name)
+    }
+}
+
+func Test_GetAllCollections(t *testing.T){
+    // mocking the collections based on previous tests
+    // TODO: add isolation?
+    knownCollections := []Collection{
+        {
+            Id:       "1",
+            RealmId:  "4",
+            Name:     "First collection",
+            Tasks:    nil, 
+            Projects: []Project{
+                {
+                    Id:       "10",
+                    ContextId: "",
+                    RealmId:   "4",
+                    Tasks:     nil, 
+                    Body:      "Project 10",
+                    Due:       "",
+                },
+            },
+        },
+        {
+            Id:       "2",
+            RealmId:  "4",
+            Name:     "Second Collection",
+            Tasks:    []Task{
+                {
+                    Id:"30",
+                    ProjectId:"",
+                    ContextId:"",
+                    RealmId:"4",
+                    Body:"Task 30",
+                    Due:"",
+                    Alert:"",
+                },
+            },
+            Projects: nil, 
+        },
+        {
+            Id:"20",
+            RealmId:"4",
+            Name:"Removable collection",
+            Tasks: nil,
+            Projects: nil,
+        },
+        {
+            Id:       "300",
+            Name:     "Collection 300",
+            Tasks:    nil, 
+            Projects: []Project {
+                {
+                    Id:"22",
+                    ContextId:"",
+                    RealmId:"4",
+                    Tasks: nil,
+                    Body:"Project 22",
+                    Due:"",
+                },
+            }, 
+        },
+        {
+            Id:       "40",
+            Name:     "Collection 40",
+            Tasks:    nil, 
+            Projects: nil, 
+        },
+    }
+    
+
+    // Manually marshal the known collections to create the expected outcome.
+    collectionsObject := CollectionsObject{Collections: knownCollections}
+    expected, err := collectionsObject.MarshalJSON()
+    if err != nil {
+        t.Fatalf("Failed to manually marshal known collections: %v", err)
+    }
+
+    // Execute GetAllCollections() to get the actual outcome.
+    actual, err := GetAllCollections()
+    if err != nil {
+        t.Fatalf("GetAllCollections() failed with error: %v", err)
+    }
+
+    // Compare the expected and actual outcomes.
+    if string(expected) != actual {
+        t.Errorf("Expected and actual collections JSON strings do not match.\nExpected: %s\nActual: %s", string(expected), actual)
+    }
 }
 
 

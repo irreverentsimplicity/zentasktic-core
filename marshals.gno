@@ -85,7 +85,7 @@ func (t Task) MarshalJSON() ([]byte, error) {
 	b.WriteString(t.RealmId)
 	b.WriteString(`",`)
 
-	b.WriteString(`"taskBody:"`)
+	b.WriteString(`"taskBody":"`)
 	b.WriteString(t.Body)
 	b.WriteString(`",`)
 
@@ -154,7 +154,7 @@ func (p Project) MarshalJSON() ([]byte, error) {
 
 	b.WriteString(`],`)
 
-	b.WriteString(`"projectBody:"`)
+	b.WriteString(`"projectBody":"`)
 	b.WriteString(p.Body)
 	b.WriteString(`",`)
 
@@ -203,7 +203,7 @@ func (c Collection) MarshalJSON() ([]byte, error) {
 	b.WriteString(c.Name)
 	b.WriteString(`",`)
 
-	b.WriteString(`{"collectionTasks":[`)
+	b.WriteString(`"collectionTasks":[`)
 	for i, collectionTask := range c.Tasks {
 		if i > 0 {
 			b.WriteString(`,`)
@@ -215,7 +215,7 @@ func (c Collection) MarshalJSON() ([]byte, error) {
 	}
 	b.WriteString(`],`)
 
-	b.WriteString(`{"collectionProjects":[`)
+	b.WriteString(`"collectionProjects":[`)
 	for i, collectionProject := range c.Projects {
 		if i > 0 {
 			b.WriteString(`,`)
