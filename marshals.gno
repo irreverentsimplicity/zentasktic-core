@@ -28,6 +28,10 @@ type RealmsObject struct {
 	Realms	[]Realm
 }
 
+type ObjectJourney struct {
+	ObjectPaths []ObjectPath
+}
+
 func (c Context) MarshalJSON() ([]byte, error) {
 
 	var b bytes.Buffer
@@ -285,6 +289,49 @@ func (rs RealmsObject) MarshalJSON() ([]byte, error) {
 		realmJSON, rerr := realm.MarshalJSON()
 		if rerr == nil {
 			b.WriteString(string(realmJSON))
+		}
+	}
+
+	b.WriteString(`]}`)
+
+	return b.Bytes(), nil
+}
+
+func (op ObjectPath) MarshalJSON() ([]byte, error) {
+
+	var b bytes.Buffer
+	
+	b.WriteByte('{')
+
+	b.WriteString(`"objectType":"`)
+	b.WriteString(op.ObjectType)
+	b.WriteString(`",`)
+
+	b.WriteString(`"id":"`)
+	b.WriteString(op.Id)
+	b.WriteString(`",`)
+
+	b.WriteString(`"realmId":"`)
+	b.WriteString(op.RealmId)
+	b.WriteString(`"`)
+
+	b.WriteByte('}')
+
+	return b.Bytes(), nil
+}
+
+func (oj ObjectJourney) MarshalJSON() ([]byte, error) {
+	var b bytes.Buffer
+
+	b.WriteString(`{"objectJourney":[`)
+	
+	for i, objectPath := range oj.ObjectPaths {
+		if i > 0 {
+			b.WriteString(`,`)
+		}
+		objectPathJSON, oerr := objectPath.MarshalJSON()
+		if oerr == nil {
+			b.WriteString(string(objectPathJSON))
 		}
 	}
 
