@@ -1,6 +1,10 @@
 # ZenTasktic Core
 
-A basic, minimalisitc Asess-Decide-Do implementations as `p/zentasktic` which will expose all the basic features of the framework: tasks & projects with complete workflows. Ideally, this should offer an easily forkable basis for any other custom implementation.
+A basic, minimalisitc Asess-Decide-Do implementations as `p/zentasktic`. The diagram below shows a simplified ADD workflow.
+
+![ZenTasktic](ZenTasktic-framework.png)
+
+This implementation will expose all the basic features of the framework: tasks & projects with complete workflows. Ideally, this should offer an easily forkable basis for any other custom implementation.
 
 ## Object Definitions and Default Values
 
