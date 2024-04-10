@@ -31,4 +31,8 @@ var (
 	ErrObjectPathNotUpdated			= errors.New("Object path wasn't updated")
 	ErrInvalidateDateFormat			= errors.New("Invalida date format")
 	ErrInvalidDateFilterType		= errors.New("Invalid date filter type")
+	ErrRealmIdAlreadyExists			= errors.New("A realm with the same id already exists")
+	ErrRealmIdNotAllowed			= errors.New("This is a reserved realm id")
+	ErrRealmIdNotFound				= errors.New("Realm id not found")
+	ErrRealmNotRemoved				= errors.New("Realm was not removed")
 )

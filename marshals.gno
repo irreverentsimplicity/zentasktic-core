@@ -24,6 +24,10 @@ type CollectionsObject struct {
 	Collections	[]Collection
 }
 
+type RealmsObject struct {
+	Realms	[]Realm
+}
+
 func (c Context) MarshalJSON() ([]byte, error) {
 
 	var b bytes.Buffer
@@ -245,6 +249,45 @@ func (co CollectionsObject) MarshalJSON() ([]byte, error) {
 			b.WriteString(string(collectionJSON))
 		}
 	}
+	b.WriteString(`]}`)
+
+	return b.Bytes(), nil
+}
+
+func (r Realm) MarshalJSON() ([]byte, error) {
+
+	var b bytes.Buffer
+	
+	b.WriteByte('{')
+
+	b.WriteString(`"realmId":"`)
+	b.WriteString(r.Id)
+	b.WriteString(`",`)
+
+	b.WriteString(`"realmName":"`)
+	b.WriteString(r.Name)
+	b.WriteString(`"`)
+
+	b.WriteByte('}')
+
+	return b.Bytes(), nil
+}
+
+func (rs RealmsObject) MarshalJSON() ([]byte, error) {
+	var b bytes.Buffer
+
+	b.WriteString(`{"realms":[`)
+	
+	for i, realm := range rs.Realms {
+		if i > 0 {
+			b.WriteString(`,`)
+		}
+		realmJSON, rerr := realm.MarshalJSON()
+		if rerr == nil {
+			b.WriteString(string(realmJSON))
+		}
+	}
+
 	b.WriteString(`]}`)
 
 	return b.Bytes(), nil
