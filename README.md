@@ -124,6 +124,9 @@ import "gno.land/p/demo/zentasktic"
 newTask := zentasktic.Task{Id: "20", Body: "Buy milk"}
 newTask.AddTask()
 
+// if we want to keep track of the object zen status, we update the object path
+taskPath := zentasktic.ObjectPath{ObjectType: "task", Id: "20", RealmId: "1"}
+taskPath.AddPath()
 ...
 
 editedTask := zentasktic.Task{Id: "20", Body: "Buy fresh milk"}
@@ -152,15 +155,27 @@ aerr := editedTask.zentasktic.SetAlert(alertTime)
 
 editedTask.MoveTaskToRealm("2")
 
+// if we want to keep track of the object zen status, we update the object path
+taskPath := zentasktic.ObjectPath{ObjectType: "task", Id: "20", RealmId: "2"}
+taskPath.AddPath()
+
 // after the task is done, we sent it back to Assess
 
-editedTask.MoveTaskToRealm("3")
+editedTask.MoveTaskToRealm("1")
+
+// if we want to keep track of the object zen status, we update the object path
+taskPath := zentasktic.ObjectPath{ObjectType: "task", Id: "20", RealmId: "1"}
+taskPath.AddPath()
 
 // from here, we can add it to a collection
 
 myCollection := zentasktic.GetCollectionById("1")
 
 myCollection.AddTaskToCollection(editedTask)
+
+// if we want to keep track of the object zen status, we update the object path
+taskPath := zentasktic.ObjectPath{ObjectType: "task", Id: "20", RealmId: "4"}
+taskPath.AddPath()
 
 ```
 
