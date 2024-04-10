@@ -4,7 +4,7 @@ A basic, minimalisitc Asess-Decide-Do implementations as `p/zentasktic`. The dia
 
 ![ZenTasktic](ZenTasktic-framework.png)
 
-This implementation will expose all the basic features of the framework: tasks & projects with complete workflows. Ideally, this should offer an easily forkable basis for any other custom implementation.
+This implementation will expose all the basic features of the framework: tasks & projects with complete workflows. Ideally, this should offer all the necessary building blocks for any other custom implementation.
 
 ## Object Definitions and Default Values
 
