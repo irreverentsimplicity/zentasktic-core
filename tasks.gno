@@ -210,6 +210,7 @@ func GetTaskById(taskId string) (t Task, err error) {
 			return nil, ErrTaskByIdNotFound
 		}
 	}
+	return nil, ErrTaskByIdNotFound
 }
 
 func GetAllTasks() (tasks string, err error) {

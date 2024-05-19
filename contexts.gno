@@ -126,6 +126,7 @@ func GetContextById(contextId string) (c Context, err error) {
 			return nil, ErrContextIdNotFound
 		}
 	}
+	return nil, ErrContextIdNotFound
 }
 
 func GetAllContexts() (contexts string, err error) {

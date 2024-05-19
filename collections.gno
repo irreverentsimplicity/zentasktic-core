@@ -222,6 +222,7 @@ func GetCollectionById(collectionId string) (c Collection, err error) {
 			return nil, ErrCollectionByIdNotFound
 		}
 	}
+	return nil, ErrCollectionByIdNotFound
 }
 
 func (c Collection) GetCollectionTasks() (tasks []Task, err error) {

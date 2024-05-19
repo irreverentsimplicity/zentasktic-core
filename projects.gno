@@ -163,6 +163,7 @@ func GetProjectById(projectId string) (p Project, err error) {
 			return nil, ErrProjectByIdNotFound
 		}
 	}
+	return nil, ErrProjectByIdNotFound
 }
 
 func GetAllProjects() (projects string, err error) {

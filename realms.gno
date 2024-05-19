@@ -73,6 +73,7 @@ func GetRealmById(realmId string) (r Realm, err error) {
 			return nil, ErrRealmIdNotFound
 		}
 	}
+	return nil, ErrRealmIdNotFound
 }
 
 func GetRealms() (realms string, err error) {
