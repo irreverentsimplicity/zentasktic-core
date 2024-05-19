@@ -18,57 +18,55 @@ type Task struct {
 	Alert		string `json:"taskAlert"`
 }
 
-var (
-	Tasks avl.Tree // taskId -> Task
-)
+type ZTaskManager struct {
+	Tasks avl.Tree
+}
+
+func NewZTaskManager() *ZTaskManager {
+	return &ZTaskManager{
+		Tasks: avl.New(),
+	}
+}
 
 // actions
 
-func (t Task) AddTask() (err error) {
-	// implementation
-	
-	if Tasks.Size() != 0 {
-		existingTask, exist := Tasks.Get(t.Id)
+func (ztm *ZTaskManager) AddTask(t Task) error {
+	if ztm.Tasks.Size() != 0 {
+		_, exist := ztm.Tasks.Get(t.Id)
 		if exist {
 			return ErrTaskIdAlreadyExists
 		}
 	}
-	Tasks.Set(t.Id, t)
+	ztm.Tasks.Set(t.Id, t)
 	return nil
 }
 
-func (t Task) RemoveTask() (err error) {
-	// implementation
-	existingTask := Task{}
-	if Tasks.Size() != 0 {
-		existingTask, exist := Tasks.Get(t.Id)
-		if !exist {
-			return ErrTaskIdNotFound
-		}
+func (ztm *ZTaskManager) RemoveTask(t Task) error {
+	existingTaskInterface, exist := ztm.Tasks.Get(t.Id)
+	if !exist {
+		return ErrTaskIdNotFound
 	}
-	
-	// task is removable only in Asses (RealmId 1) or via a Collection (RealmId 4)
-	if t.RealmId != "1" && t.RealmId != "4" {
+	existingTask := existingTaskInterface.(Task)
+
+	 // task is removable only in Asses (RealmId 1) or via a Collection (RealmId 4)
+	if existingTask.RealmId != "1" && existingTask.RealmId != "4" {
 		return ErrTaskNotRemovable
 	}
 
-	_, removed := Tasks.Remove(existingTask.Id)
+	_, removed := ztm.Tasks.Remove(existingTask.Id)
 	if !removed {
 		return ErrTaskNotRemoved
 	}
 	return nil
 }
 
-func (t Task) EditTask() (err error) {
-	// implementation, get task by Id and replace the object
-	existingTask := Task{}
-	if Tasks.Size() != 0 {
-		existingTask, exist := Tasks.Get(t.Id)
-		if !exist {
-			return ErrTaskIdNotFound
-		}
+func (ztm *ZTaskManager) EditTask(t Task) error {
+	existingTaskInterface, exist := ztm.Tasks.Get(t.Id)
+	if !exist {
+		return ErrTaskIdNotFound
 	}
-	
+	existingTask := existingTaskInterface.(Task)
+
 	// task Body is editable only when task is in Assess, RealmId = "1"
 	if t.RealmId != "1" {
 		if t.Body != existingTask.Body {
@@ -76,155 +74,148 @@ func (t Task) EditTask() (err error) {
 		}
 	}
 
-	Tasks.Set(t.Id, t)
+	ztm.Tasks.Set(t.Id, t)
 	return nil
 }
 
-// helper function, we can achieve the same with EditTask() above
-func (t Task) MoveTaskToRealm(realmId string) (err error) {
-	// implementation
-	if Tasks.Size() != 0 {
-		existingTask, exist := Tasks.Get(t.Id)
-		if !exist {
-			return ErrTaskIdNotFound
-		}
-		existingTask.(Task).RealmId = realmId
-		Tasks.Set(t.Id, existingTask)
+// Helper function to move a task to a different realm
+func (ztm *ZTaskManager) MoveTaskToRealm(taskId, realmId string) error {
+	existingTaskInterface, exist := ztm.Tasks.Get(taskId)
+	if !exist {
+		return ErrTaskIdNotFound
 	}
+	existingTask := existingTaskInterface.(Task)
+	existingTask.RealmId = realmId
+	ztm.Tasks.Set(taskId, existingTask)
 	return nil
 }
 
-func (t Task) AttachTaskToProject(p Project) (err error) {
-	// implementation
-	if Projects.Size() != 0 {
-		existingProject, exist := Projects.Get(p.Id)
-		if !exist {
-			return ErrProjectIdNotFound
-		}
+func (ztm *ZTaskManager) SetTaskDueDate(taskId, dueDate string) error {
+	taskInterface, exist := ztm.Tasks.Get(taskId)
+	if !exist {
+		return ErrTaskIdNotFound
 	}
+	task := taskInterface.(Task)
 
-	existingProjectTasks, texist := ProjectTasks.Get(p.Id)
-	if !texist {
-		// If the project has no tasks yet, initialize the slice.
-		existingProjectTasks = []Task{}
+	if task.RealmId == "2" {
+		task.Due = dueDate
+		ztm.Tasks.Set(task.Id, task)
 	} else {
-		tasks, ok := existingProjectTasks.([]Task)
+		return ErrTaskNotEditable
+	}
+
+	return nil
+}
+
+func (ztm *ZTaskManager) SetTaskAlert(taskId, alertDate string) error {
+	taskInterface, exist := ztm.Tasks.Get(taskId)
+	if !exist {
+		return ErrTaskIdNotFound
+	}
+	task := taskInterface.(Task)
+
+	if task.RealmId == "2" {
+		task.Alert = alertDate
+		ztm.Tasks.Set(task.Id, task)
+	} else {
+		return ErrTaskNotEditable
+	}
+
+	return nil
+}
+
+// tasks & projects association
+
+func (zpm *ZProjectManager) AttachTaskToProject(ztm *ZTaskManager, t Task, p Project) error {
+	existingProjectInterface, exist := zpm.Projects.Get(p.Id)
+	if !exist {
+		return ErrProjectIdNotFound
+	}
+	existingProject := existingProjectInterface.(Project)
+
+	existingProjectTasksInterface, texist := zpm.ProjectTasks.Get(p.Id)
+	if !texist {
+		existingProject.Tasks = []Task{}
+	} else {
+		tasks, ok := existingProjectTasksInterface.([]Task)
 		if !ok {
 			return ErrProjectTasksNotFound
 		}
-		existingProjectTasks = tasks
+		existingProject.Tasks = tasks
 	}
-	t.ProjectId = p.Id
-	t.EditTask()
-	updatedTasks := append(existingProjectTasks.([]Task), t)
 
-	ProjectTasks.Set(p.Id, updatedTasks)
+	t.ProjectId = p.Id
+	if err := ztm.EditTask(t); err != nil {
+		return err
+	}
+
+	updatedTasks := append(existingProject.Tasks, t)
+	zpm.ProjectTasks.Set(p.Id, updatedTasks)
 
 	return nil
 }
 
-func (t Task) DetachTaskFromProject(p Project) (err error) {
-	// implementation
-	if Projects.Size() != 0 {
-		existingProject, exist := Projects.Get(p.Id)
-		if !exist {
-			return ErrProjectIdNotFound
-		}
+func (zpm *ZProjectManager) DetachTaskFromProject(ztm *ZTaskManager, t Task, p Project) error {
+	existingProjectInterface, exist := zpm.Projects.Get(p.Id)
+	if !exist {
+		return ErrProjectIdNotFound
 	}
+	existingProject := existingProjectInterface.(Project)
 
-	existingProjectTasks, texist := ProjectTasks.Get(p.Id)
+	existingProjectTasksInterface, texist := zpm.ProjectTasks.Get(p.Id)
 	if !texist {
-		// If the project has no tasks yet, return appropriate error
 		return ErrProjectTasksNotFound
 	}
+	tasks, ok := existingProjectTasksInterface.([]Task)
+	if !ok {
+		return ErrProjectTasksNotFound
+	}
+	existingProject.Tasks = tasks
 
-	// Find the index of the task to be removed.
 	var index int = -1
-	for i, task := range existingProjectTasks.([]Task) {
+	for i, task := range existingProject.Tasks {
 		if task.Id == t.Id {
 			index = i
 			break
 		}
 	}
 
-	// If the task was found, we remove it from the slice.
 	if index != -1 {
-		existingProjectTasks = append(existingProjectTasks.([]Task)[:index], existingProjectTasks.([]Task)[index+1:]...)
+		existingProject.Tasks = append(existingProject.Tasks[:index], existingProject.Tasks[index+1:]...)
 	} else {
-		// Task not found in the project
-		return ErrTaskByIdNotFound 
+		return ErrTaskByIdNotFound
 	}
+
 	t.ProjectId = ""
-	t.EditTask()
-	ProjectTasks.Set(p.Id, existingProjectTasks)
+	if err := ztm.EditTask(t); err != nil {
+		return err
+	}
 
+	zpm.ProjectTasks.Set(p.Id, existingProject.Tasks)
 	return nil
 }
 
-func (t Task) SetTaskDueDate(dueDate string) (err error) {
-	// implementation
-	// check if task exists
-	task, exist := Tasks.Get(t.Id)
-	if !exist {
-		return ErrTaskIdNotFound
-	}
-
-	// check to see if task is in RealmId = 2 (Decide)
-	// we can only add resources in Decide
-	if t.RealmId == "2" {
-		task.(Task).Due = dueDate
-		Tasks.Set(t.Id, task.(Task))
-	} else {
-		return ErrTaskNotEditable
-	}
-
-	return nil
-}
-
-func (t Task) SetTaskAlert(alertDate string) (err error) {
-	// check if task exists
-	task, exist := Tasks.Get(t.Id)
-	if !exist {
-		return ErrTaskIdNotFound
-	}
-
-	// check to see if task is in RealmId = 2 (Decide)
-	// we can only add resources in Decide
-	if t.RealmId == "2" {
-		task.(Task).Alert = alertDate
-		Tasks.Set(t.Id, task.(Task))
-	} else {
-		return ErrTaskNotEditable
-	}
-
-	return nil
-}
 // getters
 
-func GetTaskById(taskId string) (t Task, err error) {
-	if Tasks.Size() != 0 {
-		t, exist := Tasks.Get(taskId)
+func (ztm *ZTaskManager) GetTaskById(taskId string) (Task, error) {
+	if ztm.Tasks.Size() != 0 {
+		tInterface, exist := ztm.Tasks.Get(taskId)
 		if exist {
-			return t.(Task), nil
-		} else {
-			return nil, ErrTaskByIdNotFound
+			return tInterface.(Task), nil
 		}
 	}
-	return nil, ErrTaskByIdNotFound
+	return Task{}, ErrTaskIdNotFound
 }
 
-func GetAllTasks() (tasks string, err error) {
-	// implementation
+func (ztm *ZTaskManager) GetAllTasks() (tasks string, error) {
 	var allTasks []Task
 
-	// Iterate over the Tasks AVL tree to collect all Task objects.
-	Tasks.Iterate("", "", func(key string, value interface{}) bool {
+	ztm.Tasks.Iterate("", "", func(key string, value interface{}) bool {
 		if task, ok := value.(Task); ok {
 			allTasks = append(allTasks, task)
 		}
-		return false // Continue iteration until all nodes have been visited.
+		return false
 	})
-
 	// Create a TasksObject with all collected tasks.
 	tasksObject := &TasksObject{
 		Tasks: allTasks,
@@ -236,53 +227,49 @@ func GetAllTasks() (tasks string, err error) {
 		return "", merr
 	} 
 	return string(marshalledTasks), nil
+
+	
 }
 
-func GetTasksByRealm(realmId string) (tasks string, err error) {
-	// implementation
+func (ztm *ZTaskManager) GetTasksByRealm(realmId string) (tasks string, error) {
 	var realmTasks []Task
 
-	// Iterate over the Tasks AVL tree to collect all Task objects.
-	
-	Tasks.Iterate("", "", func(key string, value interface{}) bool {
+	ztm.Tasks.Iterate("", "", func(key string, value interface{}) bool {
 		if task, ok := value.(Task); ok {
 			if task.RealmId == realmId {
 				realmTasks = append(realmTasks, task)
 			}
 		}
-		return false // Continue iteration until all nodes have been visited.
+		return false
 	})
 
 	// Create a TasksObject with all collected tasks.
-	tasksObject := TasksObject{
+	tasksObject := &TasksObject{
 		Tasks: realmTasks,
 	}
 
 	// Use the custom MarshalJSON method to marshal the tasks into JSON.
 	marshalledTasks, merr := tasksObject.MarshalJSON()
 	if merr != nil {
-		return "", merr
+			return "", merr
 	} 
 	return string(marshalledTasks), nil
 }
 
-func GetTasksByContext(contextId string) (tasks string, err error) {
-	// implementation
+func (ztm *ZTaskManager) GetTasksByContext(contextId string) (tasks string, error) {
 	var contextTasks []Task
 
-	// Iterate over the Tasks AVL tree to collect all Task objects.
-	
-	Tasks.Iterate("", "", func(key string, value interface{}) bool {
+	ztm.Tasks.Iterate("", "", func(key string, value interface{}) bool {
 		if task, ok := value.(Task); ok {
 			if task.ContextId == contextId {
 				contextTasks = append(contextTasks, task)
 			}
 		}
-		return false // Continue iteration until all nodes have been visited.
+		return false
 	})
 
 	// Create a TasksObject with all collected tasks.
-	tasksObject := TasksObject{
+	tasksObject := &TasksObject{
 		Tasks: contextTasks,
 	}
 
@@ -294,24 +281,22 @@ func GetTasksByContext(contextId string) (tasks string, err error) {
 	return string(marshalledTasks), nil
 }
 
-func GetTasksByDate(taskDate string, filterType string) (tasks string, err error) {
-	// implementation
-	parsedDate, err:= time.Parse("2006-01-02", taskDate)
+func (ztm *ZTaskManager) GetTasksByDate(taskDate string, filterType string) (tasks string, error) {
+	parsedDate, err := time.Parse("2006-01-02", taskDate)
 	if err != nil {
-		return "", ErrInvalidateDateFormat
+		return nil, ErrInvalidateDateFormat
 	}
 
 	var filteredTasks []Task
-	
-	Tasks.Iterate("", "", func(key string, value interface{}) bool {
+
+	ztm.Tasks.Iterate("", "", func(key string, value interface{}) bool {
 		task, ok := value.(Task)
 		if !ok {
-			return false // Skip this iteration and continue.
+			return false
 		}
 
 		storedDate, serr := time.Parse("2006-01-02", task.Due)
 		if serr != nil {
-			// Skip tasks with invalid dates.
 			return false
 		}
 
@@ -330,15 +315,11 @@ func GetTasksByDate(taskDate string, filterType string) (tasks string, err error
 			}
 		}
 
-		return false // Continue iteration.
+		return false
 	})
 
-	if len(filteredTasks) == 0 {
-		return "", nil
-	}
-
 	// Create a TasksObject with all collected tasks.
-	tasksObject := TasksObject{
+	tasksObject := &TasksObject{
 		Tasks: filteredTasks,
 	}
 
