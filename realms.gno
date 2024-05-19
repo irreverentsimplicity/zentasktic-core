@@ -15,17 +15,37 @@ type Realm struct {
 	Name 		string `json:"realmName"`
 }
 
-// initialize with hardcoded values: 1 Assess, 2 Decide, 3 Do, 4 Collections
-var (
+type ZRealmManager struct {
 	Realms avl.Tree
-)
+}
+
+func NewZRealmManager() *ZRealmManager {
+	zrm := &ZRealmManager{
+		Realms: avl.New(),
+	}
+	zrm.initializeHardcodedRealms()
+	return zrm
+}
 
 
+func (zrm *ZRealmManager) initializeHardcodedRealms() {
+	hardcodedRealms := []Realm{
+		{Id: "1", Name: "Assess"},
+		{Id: "2", Name: "Decide"},
+		{Id: "3", Name: "Do"},
+		{Id: "4", Name: "Collections"},
+	}
 
-func (r Realm) AddRealm() (err error){
+	for _, realm := range hardcodedRealms {
+		zrm.Realms.Set(realm.Id, realm)
+	}
+}
+
+
+func (zrm *ZRealmManager) AddRealm(r Realm) (err error){
 	// implementation
-	if Realms.Size() != 0 {
-		existingRealm, exist := Realms.Get(r.Id)
+	if zrm.Realms.Size() != 0 {
+		_, exist := zrm.Realms.Get(r.Id)
 		if exist {
 			return ErrRealmIdAlreadyExists
 		}
@@ -34,16 +54,15 @@ func (r Realm) AddRealm() (err error){
 	if r.Id == "1" || r.Id == "2" || r.Id == "3" || r.Id == "4" {
 		return ErrRealmIdNotAllowed
 	}
-	Realms.Set(r.Id, r)
+	zrm.Realms.Set(r.Id, r)
 	return nil
 	
 }
 
-func (r Realm) RemoveRealm() (err error){
+func (zrm *ZRealmManager) RemoveRealm(r Realm) (err error){
 	// implementation
-	realm := Realm{}
-	if Realms.Size() != 0 {
-		realm, exist := Realms.Get(r.Id)
+	if zrm.Realms.Size() != 0 {
+		realm, exist := zrm.Realms.Get(r.Id)
 		if !exist {
 			return ErrRealmIdNotFound
 		} else {
@@ -54,7 +73,7 @@ func (r Realm) RemoveRealm() (err error){
 		}
 	}
 	
-	_, removed := Realms.Remove(realm.(Realm).Id)
+	_, removed := zrm.Realms.Remove(realm.Id)
 	if !removed {
 		return ErrRealmNotRemoved
 	}
@@ -63,25 +82,25 @@ func (r Realm) RemoveRealm() (err error){
 }
 
 // getters
-func GetRealmById(realmId string) (r Realm, err error) {
+func (zrm *ZRealmManager) GetRealmById(realmId string) (r Realm, err error) {
 	// implementation
-	if Realms.Size() != 0 {
-		r, exist := Realms.Get(realmId)
+	if zrm.Realms.Size() != 0 {
+		rInterface, exist := zrm.Realms.Get(realmId)
 		if exist {
-			return r.(Realm), nil
+			return rInterface.(Realm), nil
 		} else {
-			return nil, ErrRealmIdNotFound
+			return Realm{}, ErrRealmIdNotFound
 		}
 	}
-	return nil, ErrRealmIdNotFound
+	return Realm{}, ErrRealmIdNotFound
 }
 
-func GetRealms() (realms string, err error) {
+func (zrm *ZRealmManager) GetRealms() (realms string, err error) {
 	// implementation
 	var allRealms []Realm
 
-	// Iterate over the Context AVL tree to collect all Context objects.
-	Realms.Iterate("", "", func(key string, value interface{}) bool {
+	// Iterate over the Realms AVL tree to collect all Context objects.
+	zrm.Realms.Iterate("", "", func(key string, value interface{}) bool {
 		if realm, ok := value.(Realm); ok {
 			allRealms = append(allRealms, realm)
 		}
