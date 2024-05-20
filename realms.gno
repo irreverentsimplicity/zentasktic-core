@@ -16,12 +16,12 @@ type Realm struct {
 }
 
 type ZRealmManager struct {
-	Realms avl.Tree
+	Realms *avl.Tree
 }
 
 func NewZRealmManager() *ZRealmManager {
 	zrm := &ZRealmManager{
-		Realms: avl.New(),
+		Realms: avl.NewTree(),
 	}
 	zrm.initializeHardcodedRealms()
 	return zrm
@@ -73,7 +73,7 @@ func (zrm *ZRealmManager) RemoveRealm(r Realm) (err error){
 		}
 	}
 	
-	_, removed := zrm.Realms.Remove(realm.Id)
+	_, removed := zrm.Realms.Remove(r.Id)
 	if !removed {
 		return ErrRealmNotRemoved
 	}

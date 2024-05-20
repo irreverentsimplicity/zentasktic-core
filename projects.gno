@@ -20,15 +20,15 @@ type Project struct {
 }
 
 type ZProjectManager struct {
-	Projects avl.Tree // projectId -> Project
-	ProjectTasks avl.Tree // projectId -> []Task
+	Projects *avl.Tree // projectId -> Project
+	ProjectTasks *avl.Tree // projectId -> []Task
 }
 
 
 func NewZProjectManager() *ZProjectManager {
 	return &ZProjectManager{
-		Projects: avl.New(),
-		ProjectTasks: avl.New(),
+		Projects: avl.NewTree(),
+		ProjectTasks: avl.NewTree(),
 	}
 }
 
@@ -49,8 +49,8 @@ func (zpm *ZProjectManager) AddProject(p Project) (err error) {
 
 func (zpm *ZProjectManager) RemoveProject(p Project) (err error) {
 	// implementation, remove from ProjectTasks too
-	var existingProject Project{}
-	var existingProjectTasks []Task
+	existingProject := Project{}
+	existingProjectTasks := []Task
 
 	if zpm.Projects.Size() != 0 {
 		existingProject, exist := zpm.Projects.Get(p.Id)

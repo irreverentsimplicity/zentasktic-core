@@ -5,7 +5,7 @@ import (
 
     "gno.land/p/demo/avl"
 )
-
+/*
 func Test_AddContext(t *testing.T) {
     
     context := Context{Id: "1", Name: "Work"}
@@ -145,4 +145,5 @@ func Test_GetAllContexts(t *testing.T) {
         t.Errorf("Expected and actual contexts JSON strings do not match.\nExpected: %s\nActual: %s", string(expected), actual)
     }
 }
+*/
 

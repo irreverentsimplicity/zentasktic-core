@@ -19,12 +19,12 @@ type Task struct {
 }
 
 type ZTaskManager struct {
-	Tasks avl.Tree
+	Tasks *avl.Tree
 }
 
 func NewZTaskManager() *ZTaskManager {
 	return &ZTaskManager{
-		Tasks: avl.New(),
+		Tasks: avl.NewTree(),
 	}
 }
 
@@ -207,7 +207,7 @@ func (ztm *ZTaskManager) GetTaskById(taskId string) (Task, error) {
 	return Task{}, ErrTaskIdNotFound
 }
 
-func (ztm *ZTaskManager) GetAllTasks() (tasks string, error) {
+func (ztm *ZTaskManager) GetAllTasks() (task string, err error) {
 	var allTasks []Task
 
 	ztm.Tasks.Iterate("", "", func(key string, value interface{}) bool {
@@ -231,7 +231,7 @@ func (ztm *ZTaskManager) GetAllTasks() (tasks string, error) {
 	
 }
 
-func (ztm *ZTaskManager) GetTasksByRealm(realmId string) (tasks string, error) {
+func (ztm *ZTaskManager) GetTasksByRealm(realmId string) (tasks string, err error) {
 	var realmTasks []Task
 
 	ztm.Tasks.Iterate("", "", func(key string, value interface{}) bool {
@@ -256,7 +256,7 @@ func (ztm *ZTaskManager) GetTasksByRealm(realmId string) (tasks string, error) {
 	return string(marshalledTasks), nil
 }
 
-func (ztm *ZTaskManager) GetTasksByContext(contextId string) (tasks string, error) {
+func (ztm *ZTaskManager) GetTasksByContext(contextId string) (tasks string, err error) {
 	var contextTasks []Task
 
 	ztm.Tasks.Iterate("", "", func(key string, value interface{}) bool {
@@ -281,10 +281,10 @@ func (ztm *ZTaskManager) GetTasksByContext(contextId string) (tasks string, erro
 	return string(marshalledTasks), nil
 }
 
-func (ztm *ZTaskManager) GetTasksByDate(taskDate string, filterType string) (tasks string, error) {
+func (ztm *ZTaskManager) GetTasksByDate(taskDate string, filterType string) (tasks string, err error) {
 	parsedDate, err := time.Parse("2006-01-02", taskDate)
 	if err != nil {
-		return nil, ErrInvalidateDateFormat
+		return "", ErrInvalidateDateFormat
 	}
 
 	var filteredTasks []Task

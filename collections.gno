@@ -18,16 +18,16 @@ type Collection struct {
 }
 
 type ZCollectionManager struct {
-	Collections avl.Tree 
-	CollectionTasks avl.Tree
-	CollectionProjects avl.Tree 
+	Collections *avl.Tree 
+	CollectionTasks *avl.Tree
+	CollectionProjects *avl.Tree 
 }
 
 func NewZCollectionManager() *ZCollectionManager {
     return &ZCollectionManager{
-        Collections: avl.New(),
-        CollectionTasks: avl.New(),
-        CollectionProjects: avl.New(),
+        Collections: avl.NewTree(),
+        CollectionTasks: avl.NewTree(),
+        CollectionProjects: avl.NewTree(),
     }
 }
 
