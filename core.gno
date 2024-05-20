@@ -23,7 +23,7 @@ type ZObjectPathManager struct {
 
 func NewZObjectPathManager() *ZObjectPathManager {
 	return &ZObjectPathManager{
-		Paths: avl.New(),
+		Paths: *avl.NewTree(),
 		PathId: 1,
 	}
 }
