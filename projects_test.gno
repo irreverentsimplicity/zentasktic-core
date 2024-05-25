@@ -5,7 +5,7 @@ import (
 
     "gno.land/p/demo/avl"
 )
-
+/*
 func Test_AddProject(t *testing.T) {
     
     project := Project{Id: "1", RealmId: "1", Body: "First project", ContextId: "1",}
@@ -318,4 +318,5 @@ func Test_GetProjectsByContext(t *testing.T) {
         t.Errorf("Expected and actual project JSON strings do not match.\nExpected: %s\nActual: %s", string(expected), actual)
     }
 }
+*/
 

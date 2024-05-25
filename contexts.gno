@@ -9,79 +9,73 @@ import (
 	"gno.land/p/demo/avl"
 )
 
-
 type Context struct {
-	Id 			string `json:"contextId"`
-	Name 		string `json:"contextName"`
+	Id   string `json:"contextId"`
+	Name string `json:"contextName"`
 }
 
-var (
-	Contexts avl.Tree // contextId -> Context
-)
+type ZContextManager struct {
+	Contexts *avl.Tree
+}
 
-// actions
+func NewZContextManager() *ZContextManager {
+	return &ZContextManager{
+		Contexts: avl.NewTree(),
+	}
+}
 
-func (c Context) AddContext() (err error) {
-	// implementation
-	if Contexts.Size() != 0 {
-		existingContext, exist := Contexts.Get(c.Id)
+// Actions
+
+func (zcm *ZContextManager) AddContext(c Context) error {
+	if zcm.Contexts.Size() != 0 {
+		_, exist := zcm.Contexts.Get(c.Id)
 		if exist {
 			return ErrContextIdAlreadyExists
 		}
 	}
-	Contexts.Set(c.Id, c)
+	zcm.Contexts.Set(c.Id, c)
 	return nil
 }
 
-func (c Context) EditContext() (err error){
-	if Contexts.Size() != 0 {
-		existingContext, exist := Contexts.Get(c.Id)
+func (zcm *ZContextManager) EditContext(c Context) error {
+	if zcm.Contexts.Size() != 0 {
+		_, exist := zcm.Contexts.Get(c.Id)
 		if !exist {
 			return ErrContextIdNotFound
 		}
 	}
-	
-	Contexts.Set(c.Id, c)
+	zcm.Contexts.Set(c.Id, c)
 	return nil
 }
 
-
-func (c Context) RemoveContext() (err error) {
-	// implementation
-	context := Context{}
-	if Contexts.Size() != 0 {
-		context, exist := Contexts.Get(c.Id)
+func (zcm *ZContextManager) RemoveContext(c Context) error {
+	if zcm.Contexts.Size() != 0 {
+		context, exist := zcm.Contexts.Get(c.Id)
 		if !exist {
 			return ErrContextIdNotFound
 		}
-	}
-
-	_, removed := Contexts.Remove(context.(Context).Id)
-	if !removed {
-		return ErrContextNotRemoved
+		_, removed := zcm.Contexts.Remove(context.(Context).Id)
+		if !removed {
+			return ErrContextNotRemoved
+		}
 	}
 	return nil
 }
 
-
-func (c Context) AddContextToTask(t Task) (err error) {
-	// implementation
-	// check if task exists
-	task, exist := Tasks.Get(t.Id)
+func (zcm *ZContextManager) AddContextToTask(ztm *ZTaskManager, c Context, t Task) error {
+	taskInterface, exist := ztm.Tasks.Get(t.Id)
 	if !exist {
 		return ErrTaskIdNotFound
 	}
-	// check if context exists
-	context, cexist := Contexts.Get(c.Id)
+	contextInterface, cexist := zcm.Contexts.Get(c.Id)
 	if !cexist {
 		return ErrContextIdNotFound
 	}
 
-	// check to see if task is in RealmId = 2 (Decide)
-	// we can only add resources in Decide
 	if t.RealmId == "2" {
-		task.(Task).ContextId = c.Id
-		Tasks.Set(t.Id, task.(Task))
+		task := taskInterface.(Task)
+		task.ContextId = c.Id
+		ztm.Tasks.Set(t.Id, task)
 	} else {
 		return ErrTaskNotEditable
 	}
@@ -89,24 +83,20 @@ func (c Context) AddContextToTask(t Task) (err error) {
 	return nil
 }
 
-
-func (c Context) AddContextToProject(p Project) (err error) {
-	// check if project exists
-	project, exist := Projects.Get(p.Id)
+func (zcm *ZContextManager) AddContextToProject(zpm *ZProjectManager, c Context, p Project) error {
+	projectInterface, exist := zpm.Projects.Get(p.Id)
 	if !exist {
 		return ErrProjectIdNotFound
 	}
-	// check if context exists
-	context, cexist := Contexts.Get(c.Id)
+	contextInterface, cexist := zcm.Contexts.Get(c.Id)
 	if !cexist {
 		return ErrContextIdNotFound
 	}
 
-	// check to see if project is in RealmId = 2 (Decide)
-	// we can only add resources in Decide
 	if p.RealmId == "2" {
-		project.(Project).ContextId = c.Id
-		Projects.Set(p.Id, project.(Project))
+		project := projectInterface.(Project)
+		project.ContextId = c.Id
+		zpm.Projects.Set(p.Id, project)
 	} else {
 		return ErrProjectNotEditable
 	}
@@ -114,33 +104,29 @@ func (c Context) AddContextToProject(p Project) (err error) {
 	return nil
 }
 
-
 // getters
 
-func GetContextById(contextId string) (c Context, err error) {
-	if Contexts.Size() != 0 {
-		c, exist := Contexts.Get(contextId)
+func (zcm *ZContextManager) GetContextById(contextId string) (Context, error) {
+	if zcm.Contexts.Size() != 0 {
+		cInterface, exist := zcm.Contexts.Get(contextId)
 		if exist {
-			return c.(Context), nil
-		} else {
-			return nil, ErrContextIdNotFound
+			return cInterface.(Context), nil
 		}
+		return Context{}, ErrContextIdNotFound
 	}
-	return nil, ErrContextIdNotFound
+	return Context{}, ErrContextIdNotFound
 }
 
-func GetAllContexts() (contexts string, err error) {
-	// implementation
+func (zcm *ZContextManager) GetAllContexts() (string, error) {
 	var allContexts []Context
 
-	// Iterate over the Context AVL tree to collect all Context objects.
-	Contexts.Iterate("", "", func(key string, value interface{}) bool {
+	// Iterate over the Contexts AVL tree to collect all Context objects.
+	zcm.Contexts.Iterate("", "", func(key string, value interface{}) bool {
 		if context, ok := value.(Context); ok {
 			allContexts = append(allContexts, context)
 		}
 		return false // Continue iteration until all nodes have been visited.
 	})
-
 
 	// Create a ContextsObject with all collected contexts.
 	contextsObject := &ContextsObject{
@@ -151,6 +137,7 @@ func GetAllContexts() (contexts string, err error) {
 	marshalledContexts, merr := contextsObject.MarshalJSON()
 	if merr != nil {
 		return "", merr
-	} 
+	}
 	return string(marshalledContexts), nil
 }
+
