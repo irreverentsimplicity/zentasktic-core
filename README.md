@@ -119,63 +119,79 @@ package example_zentasktic
 
 import "gno.land/p/demo/zentasktic"
 
+var ztm *zentasktic.ZTaskManager
+var zpm *zentasktic.ZProjectManager
+var zrm *zentasktic.ZRealmManager
+var zcm *zentasktic.ZContextManager
+var zcl *zentasktic.ZCollectionManager
+var zom *zentasktic.ZObjectPathManager
+
+func init() {
+    ztm = zentasktic.NewZTaskManager()
+    zpm = zentasktic.NewZProjectManager()
+	zrm = zentasktic.NewZRealmManager()
+	zcm = zentasktic.NewZContextManager()
+	zcl = zentasktic.NewZCollectionManager()
+	zom = zentasktic.NewZObjectPathManager()
+}
+
 // initializing a task, assuming we get the value POSTed by some call to the current realm
 
 newTask := zentasktic.Task{Id: "20", Body: "Buy milk"}
-newTask.AddTask()
+ztm.AddTask(newTask)
 
 // if we want to keep track of the object zen status, we update the object path
 taskPath := zentasktic.ObjectPath{ObjectType: "task", Id: "20", RealmId: "1"}
-taskPath.AddPath()
+zom.AddPath(taskPath)
 ...
 
 editedTask := zentasktic.Task{Id: "20", Body: "Buy fresh milk"}
-editedTask.EditTask()
+ztm.EditTask(editedTask)
 
 ...
 
 // moving it to Decide
 
-editedTask.MoveTaskToRealm("2")
+ztm.MoveTaskToRealm("20", "2")
 
 // adding context, due date and alert, assuming they're received from other calls
 
-shoppingContext := zentasktic.GetContextById("2")
+shoppingContext := zcm.GetContextById("2")
 
-cerr := shoppingContext.AddContextToTask(editedTask)
+cerr := zcm.AddContextToTask(ztm, shoppingContext, editedTask)
 
-derr := editedTask.SetTaskDueDate("2024-04-10")
+derr := ztm.SetTaskDueDate(editedTask.Id, "2024-04-10")
 now := time.Now() // replace with the actual time of the alert
 alertTime := now.Format("2006-01-02 15:04:05")
-aerr := editedTask.zentasktic.SetAlert(alertTime)
+aerr := ztm.SetTaskAlert(editedTask.Id, alertTime)
 
 ...
 
 // move the Task to Do
 
-editedTask.MoveTaskToRealm("2")
+ztm.MoveTaskToRealm(editedTask.Id, "2")
 
 // if we want to keep track of the object zen status, we update the object path
 taskPath := zentasktic.ObjectPath{ObjectType: "task", Id: "20", RealmId: "2"}
-taskPath.AddPath()
+zom.AddPath(taskPath)
 
 // after the task is done, we sent it back to Assess
 
-editedTask.MoveTaskToRealm("1")
+ztm.MoveTaskToRealm(editedTask.Id,"1")
 
 // if we want to keep track of the object zen status, we update the object path
 taskPath := zentasktic.ObjectPath{ObjectType: "task", Id: "20", RealmId: "1"}
-taskPath.AddPath()
+zom.AddPath(taskPath)
 
 // from here, we can add it to a collection
 
-myCollection := zentasktic.GetCollectionById("1")
+myCollection := zcm.GetCollectionById("1")
 
-myCollection.AddTaskToCollection(editedTask)
+zcm.AddTaskToCollection(ztm, myCollection, editedTask)
 
 // if we want to keep track of the object zen status, we update the object path
 taskPath := zentasktic.ObjectPath{ObjectType: "task", Id: "20", RealmId: "4"}
-taskPath.AddPath()
+zom.AddPath(taskPath)
 
 ```
 
