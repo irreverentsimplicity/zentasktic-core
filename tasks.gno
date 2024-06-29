@@ -205,7 +205,7 @@ func (ztm *ZTaskManager) GetTaskById(taskId string) (Task, error) {
 	return Task{}, ErrTaskIdNotFound
 }
 
-func (ztm *ZTaskManager) GetAllTasks() (task string, err error) {
+func (ztm *ZTaskManager) GetAllTasks() (task string) {
 	var allTasks []Task
 
 	ztm.Tasks.Iterate("", "", func(key string, value interface{}) bool {
@@ -222,11 +222,9 @@ func (ztm *ZTaskManager) GetAllTasks() (task string, err error) {
 	// Use the custom MarshalJSON method to marshal the tasks into JSON.
 	marshalledTasks, merr := tasksObject.MarshalJSON()
 	if merr != nil {
-		return "", merr
+		return ""
 	} 
-	return string(marshalledTasks), nil
-
-	
+	return string(marshalledTasks)	
 }
 
 func (ztm *ZTaskManager) GetTasksByRealm(realmId string) (tasks string, err error) {
