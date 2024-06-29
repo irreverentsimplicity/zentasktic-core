@@ -2,9 +2,6 @@
 package zentasktic
 
 import (
-	"strconv"
-	"errors"
-
 	"gno.land/p/demo/avl"
 )
 
@@ -62,7 +59,7 @@ func (zrm *ZRealmManager) AddRealm(r Realm) (err error){
 func (zrm *ZRealmManager) RemoveRealm(r Realm) (err error){
 	// implementation
 	if zrm.Realms.Size() != 0 {
-		realm, exist := zrm.Realms.Get(r.Id)
+		_, exist := zrm.Realms.Get(r.Id)
 		if !exist {
 			return ErrRealmIdNotFound
 		} else {

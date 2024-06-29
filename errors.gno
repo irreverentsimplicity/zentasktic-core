@@ -7,6 +7,8 @@ var (
 	ErrProjectNotEditable           = errors.New("Project is not editable")
 	ErrProjectIdNotFound			= errors.New("Project id not found")
 	ErrTaskIdNotFound				= errors.New("Task id not found")
+	ErrTaskFailedToAssert			= errors.New("Failed to assert Task type")
+	ErrProjectFailedToAssert		= errors.New("Failed to assert Project type")
 	ErrProjectTasksNotFound			= errors.New("Could not get tasks for project")
 	ErrCollectionsProjectsNotFound	= errors.New("Could not get projects for this collection")
 	ErrCollectionsTasksNotFound		= errors.New("Could not get tasks for this collection")

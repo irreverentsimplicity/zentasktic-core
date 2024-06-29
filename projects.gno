@@ -2,8 +2,6 @@
 package zentasktic
 
 import (
-	"strconv"
-	"errors"
 	"time"
 
 	"gno.land/p/demo/avl"
@@ -50,10 +48,9 @@ func (zpm *ZProjectManager) AddProject(p Project) (err error) {
 func (zpm *ZProjectManager) RemoveProject(p Project) (err error) {
 	// implementation, remove from ProjectTasks too
 	existingProject := Project{}
-	existingProjectTasks := []Task
 
 	if zpm.Projects.Size() != 0 {
-		existingProject, exist := zpm.Projects.Get(p.Id)
+		_, exist := zpm.Projects.Get(p.Id)
 		if !exist {
 			return ErrProjectIdNotFound
 		}
@@ -72,7 +69,7 @@ func (zpm *ZProjectManager) RemoveProject(p Project) (err error) {
 	// manage project tasks, if any
 
 	if zpm.ProjectTasks.Size() != 0 {
-		existingProjectTasks, exist := zpm.ProjectTasks.Get(existingProject.Id)
+		_, exist := zpm.ProjectTasks.Get(existingProject.Id)
 		if !exist {
 			// if there's no record in ProjectTasks, we don't have to remove anything
 			return nil
@@ -92,7 +89,7 @@ func (zpm *ZProjectManager) EditProject(p Project) (err error) {
 	// this is for the project body and realm, project tasks are managed in the Tasks object
 	existingProject := Project{}
 	if zpm.Projects.Size() != 0 {
-		existingProject, exist := zpm.Projects.Get(p.Id)
+		_, exist := zpm.Projects.Get(p.Id)
 		if !exist {
 			return ErrProjectIdNotFound
 		}
@@ -181,7 +178,7 @@ func (zpm *ZProjectManager) GetAllProjects() (projects string, err error) {
 	zpm.Projects.Iterate("", "", func(key string, value interface{}) bool {
 		if project, ok := value.(Project); ok {
 			// get project tasks, if any
-			projectTasks, err := zpm.GetProjectTasks(project)
+			projectTasks, _ := zpm.GetProjectTasks(project)
 			if projectTasks != nil {
 				project.Tasks = projectTasks
 			}
@@ -213,7 +210,7 @@ func (zpm *ZProjectManager) GetProjectsByRealm(realmId string) (projects string,
 		if project, ok := value.(Project); ok {
 			if project.RealmId == realmId {
 				// get project tasks, if any
-				projectTasks, err := zpm.GetProjectTasks(project)
+				projectTasks, _ := zpm.GetProjectTasks(project)
 				if projectTasks != nil {
 					project.Tasks = projectTasks
 				}
@@ -246,7 +243,7 @@ func (zpm *ZProjectManager) GetProjectsByContext(contextId string) (projects str
 		if project, ok := value.(Project); ok {
 			if project.ContextId == contextId {
 				// get project tasks, if any
-				projectTasks, err := zpm.GetProjectTasks(project)
+				projectTasks, _ := zpm.GetProjectTasks(project)
 				if projectTasks != nil {
 					project.Tasks = projectTasks
 				}
@@ -294,7 +291,7 @@ func (zpm *ZProjectManager) GetProjectsByDate(projectDate string, filterType str
 		case "specific":
 			if storedDate.Format("2006-01-02") == parsedDate.Format("2006-01-02") {
 				// get project tasks, if any
-				projectTasks, err := zpm.GetProjectTasks(project)
+				projectTasks, _ := zpm.GetProjectTasks(project)
 				if projectTasks != nil {
 					project.Tasks = projectTasks
 				}
@@ -303,7 +300,7 @@ func (zpm *ZProjectManager) GetProjectsByDate(projectDate string, filterType str
 		case "before":
 			if storedDate.Before(parsedDate) {
 				// get project tasks, if any
-				projectTasks, zerr := zpm.GetProjectTasks(project)
+				projectTasks, _ := zpm.GetProjectTasks(project)
 				if projectTasks != nil {
 					project.Tasks = projectTasks
 				}
@@ -312,7 +309,7 @@ func (zpm *ZProjectManager) GetProjectsByDate(projectDate string, filterType str
 		case "after":
 			if storedDate.After(parsedDate) {
 				// get project tasks, if any
-				projectTasks, gerr := zpm.GetProjectTasks(project)
+				projectTasks, _ := zpm.GetProjectTasks(project)
 				if projectTasks != nil {
 					project.Tasks = projectTasks
 				}

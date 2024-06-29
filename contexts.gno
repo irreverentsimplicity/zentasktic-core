@@ -2,10 +2,6 @@
 package zentasktic
 
 import (
-	"strconv"
-	"errors"
-	"time"
-
 	"gno.land/p/demo/avl"
 )
 
@@ -67,7 +63,7 @@ func (zcm *ZContextManager) AddContextToTask(ztm *ZTaskManager, c Context, t Tas
 	if !exist {
 		return ErrTaskIdNotFound
 	}
-	contextInterface, cexist := zcm.Contexts.Get(c.Id)
+	_, cexist := zcm.Contexts.Get(c.Id)
 	if !cexist {
 		return ErrContextIdNotFound
 	}
@@ -88,7 +84,7 @@ func (zcm *ZContextManager) AddContextToProject(zpm *ZProjectManager, c Context,
 	if !exist {
 		return ErrProjectIdNotFound
 	}
-	contextInterface, cexist := zcm.Contexts.Get(c.Id)
+	_, cexist := zcm.Contexts.Get(c.Id)
 	if !cexist {
 		return ErrContextIdNotFound
 	}

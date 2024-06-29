@@ -2,9 +2,6 @@
 package zentasktic
 
 import (
-	"strconv"
-	"errors"
-
 	"gno.land/p/demo/avl"
 )
 
@@ -94,7 +91,7 @@ func (zcolm *ZCollectionManager) RemoveCollection(c Collection) (err error) {
 func (zcolm *ZCollectionManager) AddProjectToCollection(zpm *ZProjectManager, c Collection, p Project) (err error) {
 	// implementation
 	if zcolm.Collections.Size() != 0 {
-		existingCollection, exist := zcolm.Collections.Get(c.Id)
+		_, exist := zcolm.Collections.Get(c.Id)
 		if !exist {
 			return ErrCollectionIdNotFound
 		}
@@ -124,7 +121,7 @@ func (zcolm *ZCollectionManager) AddProjectToCollection(zpm *ZProjectManager, c 
 func (zcolm *ZCollectionManager) AddTaskToCollection(ztm *ZTaskManager, c Collection, t Task) (err error) {
 	// implementation
 	if zcolm.Collections.Size() != 0 {
-		existingCollection, exist := zcolm.Collections.Get(c.Id)
+		_, exist := zcolm.Collections.Get(c.Id)
 		if !exist {
 			return ErrCollectionIdNotFound
 		}
@@ -154,7 +151,7 @@ func (zcolm *ZCollectionManager) AddTaskToCollection(ztm *ZTaskManager, c Collec
 func (zcolm *ZCollectionManager) RemoveProjectFromCollection(zpm *ZProjectManager, c Collection, p Project) (err error) {
 	// implementation
 	if zcolm.Collections.Size() != 0 {
-		existingCollection, exist := zcolm.Collections.Get(c.Id)
+		_, exist := zcolm.Collections.Get(c.Id)
 		if !exist {
 			return ErrCollectionIdNotFound
 		}
@@ -193,7 +190,7 @@ func (zcolm *ZCollectionManager) RemoveProjectFromCollection(zpm *ZProjectManage
 func (zcolm *ZCollectionManager) RemoveTaskFromCollection(ztm *ZTaskManager, c Collection, t Task) (err error) {
 	// implementation
 	if zcolm.Collections.Size() != 0 {
-		existingCollection, exist := zcolm.Collections.Get(c.Id)
+		_, exist := zcolm.Collections.Get(c.Id)
 		if !exist {
 			return ErrCollectionIdNotFound
 		}
@@ -253,32 +250,38 @@ func (zcolm *ZCollectionManager) GetCollectionById(collectionId string) (Collect
 }
 
 func (zcolm *ZCollectionManager) GetCollectionTasks(c Collection) (tasks []Task, err error) {
-	// implementation, query CollectionTasks and return the []Tasks object
-	existingCollectionTasks := []Task
-
+	
 	if zcolm.CollectionTasks.Size() != 0 {
-		existingCollectionTasks, exist := zcolm.CollectionTasks.Get(c.Id)
+		task, exist := zcolm.CollectionTasks.Get(c.Id)
 		if !exist {
 			// if there's no record in CollectionTasks, we don't have to return anything
 			return nil, ErrCollectionsTasksNotFound
 		} else {
-			return existingCollectionTasks.([]Task), nil
+			// type assertion to convert interface{} to []Task
+			existingCollectionTasks, ok := task.([]Task)
+			if !ok {
+				return nil, ErrTaskFailedToAssert
+			}
+			return existingCollectionTasks, nil
 		}
 	}
 	return nil, nil
 }
 
 func (zcolm *ZCollectionManager) GetCollectionProjects(c Collection) (projects []Project, err error) {
-	// implementation, query CollectionProjects and return the []Projects object
-	existingCollectionProjects := []Project
-
+	
 	if zcolm.CollectionProjects.Size() != 0 {
-		existingCollectionProjects, exist := zcolm.CollectionProjects.Get(c.Id)
+		project, exist := zcolm.CollectionProjects.Get(c.Id)
 		if !exist {
-			// if there's no record in CollectionProjects, we don't have to return anything
+			// if there's no record in CollectionProjets, we don't have to return anything
 			return nil, ErrCollectionsProjectsNotFound
 		} else {
-			return existingCollectionProjects.([]Project), nil
+			// type assertion to convert interface{} to []Projet
+			existingCollectionProjects, ok := project.([]Project)
+			if !ok {
+				return nil, ErrProjectFailedToAssert
+			}
+			return existingCollectionProjects, nil
 		}
 	}
 	return nil, nil
@@ -293,12 +296,12 @@ func (zcolm *ZCollectionManager) GetAllCollections() (collections string, err er
 	zcolm.Collections.Iterate("", "", func(key string, value interface{}) bool {
 		if collection, ok := value.(Collection); ok {
 			// get collection tasks, if any
-			collectionTasks, err := zcolm.GetCollectionTasks(collection)
+			collectionTasks, _ := zcolm.GetCollectionTasks(collection)
 			if collectionTasks != nil {
 				collection.Tasks = collectionTasks
 			}
 			// get collection prokects, if any
-			collectionProjects, err := zcolm.GetCollectionProjects(collection)
+			collectionProjects, _ := zcolm.GetCollectionProjects(collection)
 			if collectionProjects != nil {
 				collection.Projects = collectionProjects
 			}

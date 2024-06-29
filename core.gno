@@ -3,7 +3,6 @@ package zentasktic
 
 import (
 	"strconv"
-	"errors"
 
 	"gno.land/p/demo/avl"
 )
