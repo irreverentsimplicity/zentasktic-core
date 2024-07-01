@@ -113,7 +113,7 @@ func (zcm *ZContextManager) GetContextById(contextId string) (Context, error) {
 	return Context{}, ErrContextIdNotFound
 }
 
-func (zcm *ZContextManager) GetAllContexts() (string, error) {
+func (zcm *ZContextManager) GetAllContexts() (string) {
 	var allContexts []Context
 
 	// Iterate over the Contexts AVL tree to collect all Context objects.
@@ -132,8 +132,8 @@ func (zcm *ZContextManager) GetAllContexts() (string, error) {
 	// Use the custom MarshalJSON method to marshal the contexts into JSON.
 	marshalledContexts, merr := contextsObject.MarshalJSON()
 	if merr != nil {
-		return "", merr
+		return ""
 	}
-	return string(marshalledContexts), nil
+	return string(marshalledContexts)
 }
 
