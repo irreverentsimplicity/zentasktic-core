@@ -154,7 +154,7 @@ func (zpm *ZProjectManager) AttachTaskToProject(ztm *ZTaskManager, t Task, p Pro
 	return nil
 }
 
-func (zpm *ZProjectManager) DetachTaskFromProject(ztm *ZTaskManager, t Task, p Project) error {
+func (zpm *ZProjectManager) DetachTaskFromProject(ztm *ZTaskManager, taskId string, p Project) error {
 	existingProjectInterface, exist := zpm.Projects.Get(p.Id)
 	if !exist {
 		return ErrProjectIdNotFound
@@ -171,9 +171,54 @@ func (zpm *ZProjectManager) DetachTaskFromProject(ztm *ZTaskManager, t Task, p P
 	}
 	existingProject.Tasks = tasks
 
+	var foundTask Task
 	var index int = -1
 	for i, task := range existingProject.Tasks {
-		if task.Id == t.Id {
+		if task.Id == taskId {
+			index = i
+			foundTask = task
+			break
+		}
+	}
+
+	if index != -1 {
+		existingProject.Tasks = append(existingProject.Tasks[:index], existingProject.Tasks[index+1:]...)
+	} else {
+		return ErrTaskByIdNotFound
+	}
+
+	foundTask.ProjectId = ""
+	// Tasks and ProjectTasks have different storage, if a task is detached from a Project
+	// we add it to the Tasks storage
+	if err := ztm.AddTask(foundTask); err != nil {
+		return err
+	}
+
+	zpm.ProjectTasks.Set(p.Id, existingProject.Tasks)
+	return nil
+}
+
+
+func (zpm *ZProjectManager) RemoveTaskFromProject(projectTaskId string, projectId string) error {
+	existingProjectInterface, exist := zpm.Projects.Get(projectId)
+	if !exist {
+		return ErrProjectIdNotFound
+	}
+	existingProject := existingProjectInterface.(Project)
+
+	existingProjectTasksInterface, texist := zpm.ProjectTasks.Get(projectId)
+	if !texist {
+		return ErrProjectTasksNotFound
+	}
+	tasks, ok := existingProjectTasksInterface.([]Task)
+	if !ok {
+		return ErrProjectTasksNotFound
+	}
+	existingProject.Tasks = tasks
+
+	var index int = -1
+	for i, task := range existingProject.Tasks {
+		if task.Id == projectTaskId {
 			index = i
 			break
 		}
@@ -185,14 +230,7 @@ func (zpm *ZProjectManager) DetachTaskFromProject(ztm *ZTaskManager, t Task, p P
 		return ErrTaskByIdNotFound
 	}
 
-	t.ProjectId = ""
-	// Tasks and ProjectTasks have different storage, if a task is detached from a Project
-	// we add it to the Tasks storage
-	if err := ztm.AddTask(t); err != nil {
-		return err
-	}
-
-	zpm.ProjectTasks.Set(p.Id, existingProject.Tasks)
+	zpm.ProjectTasks.Set(projectId, existingProject.Tasks)
 	return nil
 }
 
