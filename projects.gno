@@ -47,17 +47,14 @@ func (zpm *ZProjectManager) AddProject(p Project) (err error) {
 
 func (zpm *ZProjectManager) RemoveProject(p Project) (err error) {
 	// implementation, remove from ProjectTasks too
-	existingProject := Project{}
-
-	if zpm.Projects.Size() != 0 {
-		_, exist := zpm.Projects.Get(p.Id)
-		if !exist {
-			return ErrProjectIdNotFound
-		}
+	existingProjectInterface, exist := zpm.Projects.Get(p.Id)
+	if !exist {
+		return ErrProjectIdNotFound
 	}
-	
-	// project is removable only in Asses (RealmId 1) or via a Collection (RealmId 4)
-	if p.RealmId != "1" && p.RealmId != "4" {
+	existingProject := existingProjectInterface.(Project)
+
+	 // project is removable only in Asses (RealmId 1) or via a Collection (RealmId 4)
+	if existingProject.RealmId != "1" && existingProject.RealmId != "4" {
 		return ErrProjectNotRemovable
 	}
 
@@ -107,17 +104,15 @@ func (zpm *ZProjectManager) EditProject(p Project) (err error) {
 }
 
 // helper function, we can achieve the same with EditProject() above
-func (zpm *ZProjectManager) MoveProjectToRealm(p Project, realmId string) (err error) {
+func (zpm *ZProjectManager) MoveProjectToRealm(projectId string, realmId string) (err error) {
 	// implementation
-	if zpm.Projects.Size() != 0 {
-		projectInterface, exist := zpm.Projects.Get(p.Id)
-		if !exist {
-			return ErrProjectIdNotFound
-		}
-		existingProject := projectInterface.(Project)
-		existingProject.RealmId = realmId
-		zpm.Projects.Set(p.Id, existingProject)
+	existingProjectInterface, exist := zpm.Projects.Get(projectId)
+	if !exist {
+		return ErrProjectIdNotFound
 	}
+	existingProject := existingProjectInterface.(Project)
+	existingProject.RealmId = realmId
+	zpm.Projects.Set(projectId, existingProject)
 	return nil
 }
 
@@ -233,7 +228,7 @@ func (zpm *ZProjectManager) GetProjectsByRealm(realmId string) (projects string)
 	return string(marshalledProjects)
 }
 
-func (zpm *ZProjectManager) GetProjectsByContext(contextId string) (projects string) {
+func (zpm *ZProjectManager) GetProjectsByContextAndRealm(contextId string, realmId string) (projects string) {
 	// implementation
 	var contextProjects []Project
 	
@@ -241,7 +236,7 @@ func (zpm *ZProjectManager) GetProjectsByContext(contextId string) (projects str
 	
 	zpm.Projects.Iterate("", "", func(key string, value interface{}) bool {
 		if project, ok := value.(Project); ok {
-			if project.ContextId == contextId {
+			if project.ContextId == contextId && project.RealmId == realmId {
 				// get project tasks, if any
 				projectTasks, _ := zpm.GetProjectTasks(project)
 				if projectTasks != nil {
@@ -270,7 +265,7 @@ func (zpm *ZProjectManager) GetProjectsByDate(projectDate string, filterType str
 	// implementation
 	parsedDate, err:= time.Parse("2006-01-02", projectDate)
 	if err != nil {
-		return "", ErrInvalidateDateFormat
+		return ""
 	}
 
 	var filteredProjects []Project

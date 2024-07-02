@@ -252,12 +252,12 @@ func (ztm *ZTaskManager) GetTasksByRealm(realmId string) (tasks string) {
 	return string(marshalledTasks)
 }
 
-func (ztm *ZTaskManager) GetTasksByContext(contextId string) (tasks string, err error) {
+func (ztm *ZTaskManager) GetTasksByContextAndRealm(contextId string, realmId string) (tasks string) {
 	var contextTasks []Task
 
 	ztm.Tasks.Iterate("", "", func(key string, value interface{}) bool {
 		if task, ok := value.(Task); ok {
-			if task.ContextId == contextId {
+			if task.ContextId == contextId && task.ContextId == realmId {
 				contextTasks = append(contextTasks, task)
 			}
 		}
@@ -272,15 +272,15 @@ func (ztm *ZTaskManager) GetTasksByContext(contextId string) (tasks string, err 
 	// Use the custom MarshalJSON method to marshal the tasks into JSON.
 	marshalledTasks, merr := tasksObject.MarshalJSON()
 	if merr != nil {
-		return "", merr
+		return ""
 	} 
-	return string(marshalledTasks), nil
+	return string(marshalledTasks)
 }
 
-func (ztm *ZTaskManager) GetTasksByDate(taskDate string, filterType string) (tasks string, err error) {
+func (ztm *ZTaskManager) GetTasksByDate(taskDate string, filterType string) (tasks string) {
 	parsedDate, err := time.Parse("2006-01-02", taskDate)
 	if err != nil {
-		return "", ErrInvalidateDateFormat
+		return ""
 	}
 
 	var filteredTasks []Task
@@ -322,7 +322,7 @@ func (ztm *ZTaskManager) GetTasksByDate(taskDate string, filterType string) (tas
 	// Use the custom MarshalJSON method to marshal the tasks into JSON.
 	marshalledTasks, merr := tasksObject.MarshalJSON()
 	if merr != nil {
-		return "", merr
+		return ""
 	} 
-	return string(marshalledTasks), nil
+	return string(marshalledTasks)
 }
