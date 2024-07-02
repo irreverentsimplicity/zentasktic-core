@@ -169,7 +169,7 @@ func (zpm *ZProjectManager) GetProjectById(projectId string) (Project, error) {
 	return Project{}, ErrProjectIdNotFound
 }
 
-func (zpm *ZProjectManager) GetAllProjects() (projects string, err error) {
+func (zpm *ZProjectManager) GetAllProjects() (projects string) {
 	// implementation
 	var allProjects []Project
 	
@@ -195,12 +195,12 @@ func (zpm *ZProjectManager) GetAllProjects() (projects string, err error) {
 	// Use the custom MarshalJSON method to marshal the tasks into JSON.
 	marshalledProjects, merr := projectsObject.MarshalJSON()
 	if merr != nil {
-		return "", merr
+		return ""
 	} 
-	return string(marshalledProjects), nil
+	return string(marshalledProjects)
 }
 
-func (zpm *ZProjectManager) GetProjectsByRealm(realmId string) (projects string, err error) {
+func (zpm *ZProjectManager) GetProjectsByRealm(realmId string) (projects string) {
 	// implementation
 	var realmProjects []Project
 	
@@ -228,12 +228,12 @@ func (zpm *ZProjectManager) GetProjectsByRealm(realmId string) (projects string,
 	// Use the custom MarshalJSON method to marshal the tasks into JSON.
 	marshalledProjects, merr := projectsObject.MarshalJSON()
 	if merr != nil {
-		return "", merr
+		return ""
 	} 
-	return string(marshalledProjects), nil
+	return string(marshalledProjects)
 }
 
-func (zpm *ZProjectManager) GetProjectsByContext(contextId string) (projects string, err error) {
+func (zpm *ZProjectManager) GetProjectsByContext(contextId string) (projects string) {
 	// implementation
 	var contextProjects []Project
 	
@@ -261,12 +261,12 @@ func (zpm *ZProjectManager) GetProjectsByContext(contextId string) (projects str
 	// Use the custom MarshalJSON method to marshal the tasks into JSON.
 	marshalledProjects, merr := projectsObject.MarshalJSON()
 	if merr != nil {
-		return "", merr
+		return ""
 	} 
-	return string(marshalledProjects), nil
+	return string(marshalledProjects)
 }
 
-func (zpm *ZProjectManager) GetProjectsByDate(projectDate string, filterType string) (projects string, err error) {
+func (zpm *ZProjectManager) GetProjectsByDate(projectDate string, filterType string) (projects string) {
 	// implementation
 	parsedDate, err:= time.Parse("2006-01-02", projectDate)
 	if err != nil {
@@ -321,7 +321,7 @@ func (zpm *ZProjectManager) GetProjectsByDate(projectDate string, filterType str
 	})
 
 	if len(filteredProjects) == 0 {
-		return "", nil
+		return ""
 	}
 
 	// Create a ProjectsObject with all collected tasks.
@@ -332,8 +332,8 @@ func (zpm *ZProjectManager) GetProjectsByDate(projectDate string, filterType str
 	// Use the custom MarshalJSON method to marshal the tasks into JSON.
 	marshalledProjects, merr := projectsObject.MarshalJSON()
 	if merr != nil {
-		return "", merr
+		return ""
 	} 
-	return string(marshalledProjects), nil
+	return string(marshalledProjects)
 
 }
