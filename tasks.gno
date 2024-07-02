@@ -143,10 +143,11 @@ func (zpm *ZProjectManager) AttachTaskToProject(ztm *ZTaskManager, t Task, p Pro
 	}
 
 	t.ProjectId = p.Id
-	if err := ztm.EditTask(t); err != nil {
-		return err
+	// @todo we need to remove it from Tasks if it was previously added there, then detached
+	existingTask, err := ztm.GetTaskById(t.Id)
+	if err == nil {
+		ztm.RemoveTask(existingTask)
 	}
-
 	updatedTasks := append(existingProject.Tasks, t)
 	zpm.ProjectTasks.Set(p.Id, updatedTasks)
 
@@ -185,7 +186,9 @@ func (zpm *ZProjectManager) DetachTaskFromProject(ztm *ZTaskManager, t Task, p P
 	}
 
 	t.ProjectId = ""
-	if err := ztm.EditTask(t); err != nil {
+	// Tasks and ProjectTasks have different storage, if a task is detached from a Project
+	// we add it to the Tasks storage
+	if err := ztm.AddTask(t); err != nil {
 		return err
 	}
 
