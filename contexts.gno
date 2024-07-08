@@ -100,6 +100,51 @@ func (zcm *ZContextManager) AddContextToProject(zpm *ZProjectManager, c Context,
 	return nil
 }
 
+func (zcm *ZContextManager) AddContextToProjectTask(zpm *ZProjectManager, c Context, p Project, projectTaskId string) error {
+	
+	_, cexist := zcm.Contexts.Get(c.Id)
+	if !cexist {
+		return ErrContextIdNotFound
+	}
+
+	existingProjectInterface, exist := zpm.Projects.Get(p.Id)
+    if !exist {
+        return ErrProjectIdNotFound
+    }
+    existingProject := existingProjectInterface.(Project)
+
+	if existingProject.RealmId != "2" {
+		return ErrProjectNotEditable
+	}
+
+    existingProjectTasksInterface, texist := zpm.ProjectTasks.Get(p.Id)
+    if !texist {
+        return ErrProjectTasksNotFound
+    }
+    tasks, ok := existingProjectTasksInterface.([]Task)
+    if !ok {
+        return ErrProjectTasksNotFound
+    }
+    existingProject.Tasks = tasks
+
+    var index int = -1
+    for i, task := range existingProject.Tasks {
+        if task.Id == projectTaskId {
+            index = i
+            break
+        }
+    }
+
+    if index != -1 {
+        existingProject.Tasks[index].ContextId = c.Id
+    } else {
+        return ErrTaskByIdNotFound
+    }
+
+    zpm.ProjectTasks.Set(p.Id, existingProject.Tasks)
+    return nil
+}
+
 // getters
 
 func (zcm *ZContextManager) GetContextById(contextId string) (Context, error) {

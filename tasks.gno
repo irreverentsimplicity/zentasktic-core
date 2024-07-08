@@ -161,6 +161,10 @@ func (zpm *ZProjectManager) EditProjectTask(projectTaskId string, projectTaskBod
     }
     existingProject := existingProjectInterface.(Project)
 
+	if existingProject.RealmId != "2" {
+		return ErrProjectNotEditable
+	}
+
     existingProjectTasksInterface, texist := zpm.ProjectTasks.Get(projectId)
     if !texist {
         return ErrProjectTasksNotFound
@@ -188,7 +192,6 @@ func (zpm *ZProjectManager) EditProjectTask(projectTaskId string, projectTaskBod
     zpm.ProjectTasks.Set(projectId, existingProject.Tasks)
     return nil
 }
-
 
 func (zpm *ZProjectManager) DetachTaskFromProject(ztm *ZTaskManager, projectTaskId string, detachedTaskId string, p Project) error {
 	existingProjectInterface, exist := zpm.Projects.Get(p.Id)
