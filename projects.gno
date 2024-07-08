@@ -14,7 +14,7 @@ type Project struct {
 	RealmId 	string `json:"projectRealmId"`
 	Tasks		[]Task `json:"projectTasks"`
 	Body 		string `json:"projectBody"`
-	Due			string `json:"ProjectDue"`
+	Due			string `json:"projectDue"`
 }
 
 type ZProjectManager struct {
@@ -131,20 +131,17 @@ func (zpm *ZProjectManager) GetProjectTasks(p Project) (tasks []Task, err error)
 	return nil, nil
 }
 
-func (zpm *ZProjectManager) SetProjectDueDate(p Project, dueDate string) (err error) {
-
-	// implementation
-	// check if project exists
-	projectInterface, exist := zpm.Projects.Get(p.Id)
+func (zpm *ZProjectManager) SetProjectDueDate(projectId string, dueDate string) (err error) {
+	projectInterface, exist := zpm.Projects.Get(projectId)
 	if !exist {
 		return ErrProjectIdNotFound
 	}
-	existingProject := projectInterface.(Project)
+	project := projectInterface.(Project)
 
 	// check to see if project is in RealmId = 2 (Decide)
-	if existingProject.RealmId == "2" {
-		existingProject.Due = dueDate
-		zpm.Projects.Set(p.Id, existingProject)
+	if project.RealmId == "2" {
+		project.Due = dueDate
+		zpm.Projects.Set(project.Id, project)
 	} else {
 		return ErrProjectNotEditable
 	}

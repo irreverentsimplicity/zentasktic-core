@@ -154,7 +154,43 @@ func (zpm *ZProjectManager) AttachTaskToProject(ztm *ZTaskManager, t Task, p Pro
 	return nil
 }
 
-func (zpm *ZProjectManager) DetachTaskFromProject(ztm *ZTaskManager, taskId string, p Project) error {
+func (zpm *ZProjectManager) EditProjectTask(projectTaskId string, projectTaskBody string, projectId string) error {
+    existingProjectInterface, exist := zpm.Projects.Get(projectId)
+    if !exist {
+        return ErrProjectIdNotFound
+    }
+    existingProject := existingProjectInterface.(Project)
+
+    existingProjectTasksInterface, texist := zpm.ProjectTasks.Get(projectId)
+    if !texist {
+        return ErrProjectTasksNotFound
+    }
+    tasks, ok := existingProjectTasksInterface.([]Task)
+    if !ok {
+        return ErrProjectTasksNotFound
+    }
+    existingProject.Tasks = tasks
+
+    var index int = -1
+    for i, task := range existingProject.Tasks {
+        if task.Id == projectTaskId {
+            index = i
+            break
+        }
+    }
+
+    if index != -1 {
+        existingProject.Tasks[index].Body = projectTaskBody
+    } else {
+        return ErrTaskByIdNotFound
+    }
+
+    zpm.ProjectTasks.Set(projectId, existingProject.Tasks)
+    return nil
+}
+
+
+func (zpm *ZProjectManager) DetachTaskFromProject(ztm *ZTaskManager, projectTaskId string, detachedTaskId string, p Project) error {
 	existingProjectInterface, exist := zpm.Projects.Get(p.Id)
 	if !exist {
 		return ErrProjectIdNotFound
@@ -174,7 +210,7 @@ func (zpm *ZProjectManager) DetachTaskFromProject(ztm *ZTaskManager, taskId stri
 	var foundTask Task
 	var index int = -1
 	for i, task := range existingProject.Tasks {
-		if task.Id == taskId {
+		if task.Id == projectTaskId {
 			index = i
 			foundTask = task
 			break
@@ -188,6 +224,7 @@ func (zpm *ZProjectManager) DetachTaskFromProject(ztm *ZTaskManager, taskId stri
 	}
 
 	foundTask.ProjectId = ""
+	foundTask.Id = detachedTaskId
 	// Tasks and ProjectTasks have different storage, if a task is detached from a Project
 	// we add it to the Tasks storage
 	if err := ztm.AddTask(foundTask); err != nil {
