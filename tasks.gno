@@ -161,7 +161,7 @@ func (zpm *ZProjectManager) EditProjectTask(projectTaskId string, projectTaskBod
     }
     existingProject := existingProjectInterface.(Project)
 
-	if existingProject.RealmId != "2" {
+	if existingProject.RealmId != "1" {
 		return ErrProjectNotEditable
 	}
 

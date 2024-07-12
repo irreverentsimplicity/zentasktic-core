@@ -104,7 +104,7 @@ func (zpm *ZProjectManager) EditProject(p Project) (err error) {
 }
 
 // helper function, we can achieve the same with EditProject() above
-func (zpm *ZProjectManager) MoveProjectToRealm(projectId string, realmId string) (err error) {
+/*func (zpm *ZProjectManager) MoveProjectToRealm(projectId string, realmId string) (err error) {
 	// implementation
 	existingProjectInterface, exist := zpm.Projects.Get(projectId)
 	if !exist {
@@ -114,7 +114,81 @@ func (zpm *ZProjectManager) MoveProjectToRealm(projectId string, realmId string)
 	existingProject.RealmId = realmId
 	zpm.Projects.Set(projectId, existingProject)
 	return nil
+}*/
+
+func (zpm *ZProjectManager) MoveProjectToRealm(projectId string, realmId string) error {
+	// Get the existing project from the Projects map
+	existingProjectInterface, exist := zpm.Projects.Get(projectId)
+	if !exist {
+		return ErrProjectIdNotFound
+	}
+	existingProject := existingProjectInterface.(Project)
+
+	// Set the project's RealmId to the new RealmId
+	existingProject.RealmId = realmId
+
+	// Get the existing project tasks from the ProjectTasks map
+	existingProjectTasksInterface, texist := zpm.ProjectTasks.Get(projectId)
+	if !texist {
+		return ErrProjectTasksNotFound
+	}
+	tasks, ok := existingProjectTasksInterface.([]Task)
+	if !ok {
+		return ErrProjectTasksNotFound
+	}
+
+	// Iterate through the project's tasks and set their RealmId to the new RealmId
+	for i := range tasks {
+		tasks[i].RealmId = realmId
+	}
+
+	// Set the updated tasks back into the ProjectTasks map
+	zpm.ProjectTasks.Set(projectId, tasks)
+
+	// Set the updated project back into the Projects map
+	zpm.Projects.Set(projectId, existingProject)
+
+	return nil
 }
+
+func (zpm *ZProjectManager) MarkProjectTaskAsDone(projectId string, projectTaskId string) error {
+    // Get the existing project from the Projects map
+    existingProjectInterface, exist := zpm.Projects.Get(projectId)
+    if !exist {
+        return ErrProjectIdNotFound
+    }
+    existingProject := existingProjectInterface.(Project)
+
+    // Get the existing project tasks from the ProjectTasks map
+    existingProjectTasksInterface, texist := zpm.ProjectTasks.Get(projectId)
+    if !texist {
+        return ErrProjectTasksNotFound
+    }
+    tasks, ok := existingProjectTasksInterface.([]Task)
+    if !ok {
+        return ErrProjectTasksNotFound
+    }
+
+    // Iterate through the project's tasks to find the task to be updated
+    var taskFound bool
+    for i, task := range tasks {
+        if task.Id == projectTaskId {
+            tasks[i].RealmId = "4" // Change the RealmId to "4"
+            taskFound = true
+            break
+        }
+    }
+
+    if !taskFound {
+        return ErrTaskByIdNotFound
+    }
+
+    // Set the updated tasks back into the ProjectTasks map
+    zpm.ProjectTasks.Set(existingProject.Id, tasks)
+
+    return nil
+}
+
 
 func (zpm *ZProjectManager) GetProjectTasks(p Project) (tasks []Task, err error) {
 	// implementation, query ProjectTasks and return the []Tasks object
